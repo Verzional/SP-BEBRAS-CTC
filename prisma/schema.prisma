@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Models //
+enum Role {
+  USER
+  ADMIN
+}
+
+model Account {
+  id           String  @id @default(cuid())
+  username     String  @unique
+  password     String
+  sessionToken String?
+  teamId       String? @unique
+  role         Role    @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team Team? @relation(fields: [teamId], references: [id])
+}
+
+model Team {
+  id       String @id @default(cuid())
+  teamName String
+  schoolId String
+  score    Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account?
+  members Member[]
+  posts   Post[]
+
+  school School @relation(fields: [schoolId], references: [id])
+}
+
+model Member {
+  id     String @id @default(cuid())
+  name   String
+  teamId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id])
+}
+
+model School {
+  id         String  @id @default(cuid())
+  schoolName String
+  picName    String?
+  picEmail   String?
+  address    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teams Team[]
+}
+
+// Post Models //
+enum Level {
+  SMP
+  SMA
+}
+
+model Post {
+  id          String  @id @default(cuid())
+  postNumber  String
+  picName     String
+  description String?
+  level       Level
+
+  teams Team[]
+}
+
+// Question Models //
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Question {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  title       String
+  description String
+  image       String?
+  difficulty  Difficulty
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answers Answer[]
+}
+
+model Answer {
+  id         String  @id @default(cuid())
+  content    String
+  questionId String
+  isCorrect  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  question Question @relation(fields: [questionId], references: [id])
+}
