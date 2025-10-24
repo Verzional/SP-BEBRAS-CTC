@@ -1,12 +1,14 @@
 import prisma from "@/lib/prisma";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { createId } from "@paralleldrive/cuid2";
+import { authConfig } from "./auth.config";
 import { verifySync } from "@node-rs/bcrypt";
+import { createId } from "@paralleldrive/cuid2";
 
 const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -18,39 +20,30 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         if (!credentials?.username || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
-
         const account = await prisma.account.findUnique({
           where: { username: credentials.username as string },
         });
-
         if (!account) {
           throw new Error("Account not found");
         }
-
         if (!account.password) {
           throw new Error("No password set for this account");
         }
-
         const isPasswordValid = verifySync(
           credentials.password as string,
           account.password
         );
-
         if (!isPasswordValid) {
           throw new Error("Invalid credentials");
         }
-
         const sessionToken = createId();
-
         const updatedAccount = await prisma.account.update({
           where: { id: account.id },
           data: { sessionToken: sessionToken },
         });
-
         if (!updatedAccount) {
           throw new Error("Failed to update account session");
         }
-
         return {
           id: updatedAccount.id,
           username: updatedAccount.username,
@@ -63,9 +56,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  pages: {
-    signIn: "/auth/login",
-  },
   events: {
     async signOut(message) {
       if ("token" in message && message.token?.id) {
@@ -77,6 +67,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
+    ...authConfig.callbacks,
+
     async redirect({ baseUrl }) {
       return baseUrl;
     },
@@ -94,13 +86,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         ) {
           throw new Error("Session expired due to inactivity");
         }
-
         if (token.id && token.activeSessionToken) {
           const currentAccount = await prisma.account.findUnique({
             where: { id: token.id as string },
             select: { sessionToken: true },
           });
-
           if (
             !currentAccount ||
             currentAccount.sessionToken !== token.activeSessionToken
@@ -111,7 +101,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           }
         }
       }
-
       return token;
     },
     async session({ session, token }) {
@@ -120,7 +109,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.username = token.username as string;
         session.user.role = token.role!;
       }
-
       return session;
     },
   },
