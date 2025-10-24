@@ -38,9 +38,10 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  account Account?
-  members Member[]
-  posts   Post[]
+  account         Account?
+  members         Member[]
+  posts           Post[]
+  solvedQuestions SolvedQuestion[]
 
   school School @relation(fields: [schoolId], references: [id])
 }
@@ -94,7 +95,6 @@ enum Difficulty {
 
 model Question {
   id          String     @id @default(cuid())
-  code        String     @unique
   title       String
   description String
   image       String?
@@ -103,7 +103,8 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  answers Answer[]
+  answers  Answer[]
+  solvedBy SolvedQuestion[]
 }
 
 model Answer {
@@ -116,6 +117,18 @@ model Answer {
   updatedAt DateTime @updatedAt
 
   question Question @relation(fields: [questionId], references: [id])
+}
+
+model SolvedQuestion {
+  id         String   @id @default(cuid())
+  teamId     String
+  questionId String
+  createdAt  DateTime @default(now())
+
+  team     Team     @relation(fields: [teamId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([teamId, questionId])
 }
 
 // Contest Models //
