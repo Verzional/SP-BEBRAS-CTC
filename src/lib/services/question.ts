@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/core/prisma";
 import { Question, Answer } from "@/generated/client/client";
 
 async function getRandomUnsolvedQuestion(
@@ -54,6 +54,7 @@ export async function getQuestionForTeam(teamId: string) {
 
     return { questionId: question.id };
   } catch (error) {
+    console.error("Error fetching question for team:", error);
     return { error: "An unexpected server error occurred." };
   }
 }

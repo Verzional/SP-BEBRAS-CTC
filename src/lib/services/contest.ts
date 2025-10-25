@@ -1,8 +1,8 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/core/prisma";
 import { auth } from "@/auth";
-import { pusherServer } from "@/lib/pusher";
+import { pusherServer } from "@/lib/core/pusher";
 import { Prisma } from "@/generated/client/client";
 import { ContestStatus } from "@/generated/client/enums";
 import { revalidatePath } from "next/cache";
