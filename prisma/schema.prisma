@@ -13,12 +13,15 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  OPERATOR
+  JUDGE
 }
 
 model Account {
   id           String  @id @default(cuid())
   username     String  @unique
   password     String
+  name         String
   sessionToken String?
   teamId       String? @unique
   role         Role    @default(USER)

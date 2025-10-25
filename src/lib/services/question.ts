@@ -53,8 +53,8 @@ export async function getQuestionForTeam(teamId: string) {
     }
 
     return { questionId: question.id };
-  } catch (error) {
-    console.error("Error fetching question for team:", error);
+  } catch (err) {
+    console.error("Error fetching question for team: ", err);
     return { error: "An unexpected server error occurred." };
   }
 }
