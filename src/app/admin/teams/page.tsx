@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { QRCodeSVG } from "qrcode.react";
 
-export default async function TeamQrListPage() {
+export default async function TeamsPage() {
   const teams = await prisma.team.findMany();
 
   return (

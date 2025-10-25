@@ -11,6 +11,7 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isAuthRoute = nextUrl.pathname === "/auth/login";
+      const isAdminRoute = nextUrl.pathname.startsWith("/admin");
 
       if (isAuthRoute) {
         if (isLoggedIn) {
@@ -20,6 +21,10 @@ export const authConfig = {
       }
 
       if (!isLoggedIn) {
+        return false;
+      }
+
+      if (isAdminRoute && (!isLoggedIn || auth?.user?.role !== "ADMIN")) {
         return false;
       }
 
