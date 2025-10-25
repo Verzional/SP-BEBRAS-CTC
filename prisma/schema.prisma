@@ -29,12 +29,12 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team Team? @relation(fields: [teamId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id], onDelete: Restrict)
 }
 
 model Team {
   id       String @id @default(cuid())
-  teamName String
+  name     String
   schoolId String
   score    Int    @default(0)
 
@@ -50,22 +50,22 @@ model Team {
 }
 
 model Member {
-  id     String @id @default(cuid())
+  id     String  @id @default(cuid())
   name   String
-  teamId String
+  teamId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team Team @relation(fields: [teamId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 }
 
 model School {
-  id         String  @id @default(cuid())
-  schoolName String
-  picName    String?
-  picEmail   String?
-  address    String?
+  id       String  @id @default(cuid())
+  name     String
+  picName  String?
+  picEmail String?
+  address  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -128,8 +128,8 @@ model SolvedQuestion {
   questionId String
   createdAt  DateTime @default(now())
 
-  team     Team     @relation(fields: [teamId], references: [id])
-  question Question @relation(fields: [questionId], references: [id])
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
 
   @@unique([teamId, questionId])
 }

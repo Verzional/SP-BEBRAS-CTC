@@ -1,11 +1,84 @@
 "use server";
 
 import prisma from "@/lib/core/prisma";
-import { Question, Answer } from "@/generated/client/client";
+import { QuestionSchema } from "@/types/db";
+import { revalidatePath } from "next/cache";
 
-async function getRandomUnsolvedQuestion(
-  teamId: string
-): Promise<(Question & { answers: Answer[] }) | null> {
+export async function getAllQuestions() {
+  return await prisma.question.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      answers: true,
+    },
+  });
+}
+
+export async function getQuestionById(questionId: string) {
+  return await prisma.question.findUnique({
+    where: { id: questionId },
+    include: { answers: true },
+  });
+}
+
+export async function createQuestion(formData: FormData) {
+  const rawData = {
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    image: formData.get("image") as string,
+  };
+
+  const result = QuestionSchema.safeParse(rawData);
+
+  if (!result.success) {
+    throw new Error("Invalid question data");
+  }
+
+  const question = await prisma.question.create({
+    data: result.data,
+  });
+
+  revalidatePath("/admin/questions");
+
+  return question;
+}
+
+export async function updateQuestion(questionId: string, formData: FormData) {
+  const rawData = {
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    image: formData.get("image") as string,
+  };
+
+  const result = QuestionSchema.safeParse(rawData);
+
+  if (!result.success) {
+    throw new Error("Invalid question data");
+  }
+
+  const question = await prisma.question.update({
+    where: { id: questionId },
+    data: result.data,
+  });
+
+  revalidatePath("/admin/questions");
+  revalidatePath(`/admin/questions/${questionId}`);
+
+  return question;
+}
+
+export async function deleteQuestion(questionId: string) {
+  const deleted = await prisma.question.delete({
+    where: { id: questionId },
+  });
+
+  revalidatePath("/admin/questions");
+
+  return deleted;
+}
+
+async function getRandomUnsolvedQuestion(teamId: string) {
   const solvedQuestionRecords = await prisma.solvedQuestion.findMany({
     where: { teamId: teamId },
     select: { questionId: true },
@@ -57,11 +130,4 @@ export async function getQuestionForTeam(teamId: string) {
     console.error("Error fetching question for team: ", err);
     return { error: "An unexpected server error occurred." };
   }
-}
-
-export async function getQuestionById(questionId: string) {
-  return await prisma.question.findUnique({
-    where: { id: questionId },
-    include: { answers: true },
-  });
 }
