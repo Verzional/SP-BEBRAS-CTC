@@ -1,6 +1,6 @@
 "use client";
 
-import { getQuestionForTeam } from "@/services/question";
+import { getQuestionForTeam } from "@/lib/services/question";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";

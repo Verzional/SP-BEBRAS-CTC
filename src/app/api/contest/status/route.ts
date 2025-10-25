@@ -1,4 +1,4 @@
-import { getActiveContest } from "@/services/contest";
+import { getActiveContest } from "@/lib/services/contest";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
