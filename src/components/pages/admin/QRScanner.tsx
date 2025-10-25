@@ -5,17 +5,30 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+interface IBoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface IDetectedBarcode {
-  boundingBox: { x: number; y: number; width: number; height: number };
-  cornerPoints: { x: number; y: number }[];
+  boundingBox: IBoundingBox;
+  cornerPoints: IPoint[];
   format: string;
   rawValue: string;
 }
 
 export default function QRScanner() {
+  const router = useRouter();
+
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleScan = async (detectedCodes: IDetectedBarcode[]) => {
     if (!loading && detectedCodes.length > 0) {
@@ -43,8 +56,8 @@ export default function QRScanner() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto" }}>
-      <h1>Scan Team QR Code</h1>
+    <>
+      <h1 className="text-2xl font-bold text-center mb-4">Scan Team QR Code</h1>
       <Scanner
         onScan={handleScan}
         onError={handleError}
@@ -52,12 +65,21 @@ export default function QRScanner() {
           facingMode: "environment",
         }}
         styles={{
-          container: { width: "100%", paddingTop: "56.25%" },
+          container: { width: "100%" },
+          video: {
+            transform: "scaleX(-1)",
+          },
         }}
       />
 
-      {loading && <p>Loading question...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-    </div>
+      {loading && (
+        <p className="text-center mt-4 font-medium">Loading question...</p>
+      )}
+      {error && (
+        <p className="text-center mt-4 text-destructive font-medium">
+          Error: {error}
+        </p>
+      )}
+    </>
   );
 }

@@ -24,7 +24,7 @@ export const authConfig = {
         return false;
       }
 
-      if (isAdminRoute && (!isLoggedIn || auth?.user?.role !== "ADMIN")) {
+      if (isAdminRoute && auth?.user?.role !== "ADMIN") {
         return false;
       }
 
