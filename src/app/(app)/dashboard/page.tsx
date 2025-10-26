@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { checkAdmin } from "@/lib/session";
-import { Dashboard } from "@/components/pages/(app)/dashboard/Dashboard";
+import { Dashboard } from "@/components/pages/app/dashboard/dashboard";
 
 export default async function DashboardPage() {
   const isAdmin = await checkAdmin();

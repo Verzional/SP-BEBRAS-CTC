@@ -12,7 +12,7 @@ export default async function TeamsPage() {
           key={team.id}
           style={{ padding: "20px", border: "1px solid #ccc" }}
         >
-          <h2>{team.teamName}</h2>
+          <h2>{team.name}</h2>
           <QRCodeSVG value={team.id} size={256} level="H" />
           <p>{team.id}</p>
         </div>

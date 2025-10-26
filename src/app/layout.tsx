@@ -1,7 +1,7 @@
 import "./globals.css";
-import { Provider } from "@/components/layout/ThemeProvider";
-import { Background } from "@/components/layout/Background";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Provider } from "@/components/layout/theme-provider";
+import { Background } from "@/components/layout/background";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 

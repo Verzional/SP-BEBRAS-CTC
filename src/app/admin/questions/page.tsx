@@ -1,3 +1,3 @@
-export default function QuestionsPage() {
-  return <div>Questions Page</div>;
+export default function CreateQuestionPage() {
+    return <div>Create Question Page - Under Construction</div>;
 }

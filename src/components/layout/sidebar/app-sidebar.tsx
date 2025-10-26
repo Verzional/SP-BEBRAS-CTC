@@ -10,8 +10,8 @@ import {
   ScanLine,
 } from "lucide-react";
 
-import { NavMain } from "@/components/layout/sidebar/NavMain";
-import { NavUser } from "@/components/layout/sidebar/NavUser";
+import { NavMain } from "@/components/layout/sidebar/nav-main";
+import { NavUser } from "@/components/layout/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
