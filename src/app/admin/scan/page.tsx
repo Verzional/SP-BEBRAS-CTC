@@ -1,4 +1,4 @@
-import { QRScanner } from "@/components/pages/admin/qr-scanner";
+import { QRScanner } from "@/components/admin/qr-scanner";
 
 export default function ScanPage() {
   return (
