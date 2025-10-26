@@ -1,4 +1,4 @@
-import "./globals.css";
+import "./globals.css"; 
 import Provider from "@/components/layout/ThemeProvider";
 import Background from "@/components/layout/Background";
 import ThemeToggle from "@/components/layout/ThemeToggle";

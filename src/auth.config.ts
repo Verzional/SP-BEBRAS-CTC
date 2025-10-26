@@ -1,9 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
-  providers: [
-
-  ],
+  providers: [],
   pages: {
     signIn: "/auth/login",
   },
@@ -17,7 +15,7 @@ export const authConfig = {
         if (isLoggedIn) {
           return Response.redirect(new URL("/", nextUrl));
         }
-        return true; 
+        return true;
       }
 
       if (!isLoggedIn) {
@@ -28,7 +26,7 @@ export const authConfig = {
         return false;
       }
 
-      return true; 
+      return true;
     },
   },
 } satisfies NextAuthConfig;
