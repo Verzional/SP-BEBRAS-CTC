@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Bot, Settings2, SquareTerminal } from "lucide-react";
+import { BookOpen, Bot, Settings2, SquareTerminal,  } from "lucide-react";
 
-import { NavMain } from "@/components/layout/sidebar/nav-main";
-import { NavUser } from "@/components/layout/sidebar/nav-user";
+import { NavMain } from "@/components/layout/sidebar/NavMain";
+import { NavUser } from "@/components/layout/sidebar/NavUser";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",

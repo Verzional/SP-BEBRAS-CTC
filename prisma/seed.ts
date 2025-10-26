@@ -1,4 +1,4 @@
-import prisma from "@/lib/core/prisma";
+import prisma from "@/lib/prisma";
 import { Role } from "@/generated/client/enums";
 import { hashSync } from "@node-rs/bcrypt";
 

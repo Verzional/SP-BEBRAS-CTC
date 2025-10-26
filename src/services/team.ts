@@ -1,4 +1,4 @@
-import prisma from "@/lib/core/prisma";
+import prisma from "@/lib/prisma";
 import { TeamSchema, TeamCreationSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
 

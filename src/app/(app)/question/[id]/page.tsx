@@ -1,4 +1,4 @@
-import { getQuestionById } from "@/lib/services/question";
+import { getQuestionById } from "@/services/question";
 
 export default async function QuestionPage({
   params,
