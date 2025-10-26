@@ -1,3 +1,5 @@
-export default function CreateAccountPage() {
-    return <div>Create Account Page - Under Construction</div>; 
+import { MemberForm } from "@/components/admin/member-form";
+
+export default function CreateMemberPage() {
+  return <MemberForm />;
 }

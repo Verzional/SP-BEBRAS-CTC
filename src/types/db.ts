@@ -33,16 +33,6 @@ export const TeamSchema = z.object({
 
 export type Team = z.infer<typeof TeamSchema>;
 
-// Team Creation Schema (includes first member)
-export const TeamCreationSchema = TeamSchema.extend({
-  memberName: z
-    .string()
-    .min(1, "At least one member is required")
-    .max(100, "Member name must be less than 100 characters"),
-});
-
-export type TeamCreation = z.infer<typeof TeamCreationSchema>;
-
 // Member Schema
 export const MemberSchema = z.object({
   teamId: z.cuid2("Team is required"),
@@ -51,3 +41,30 @@ export const MemberSchema = z.object({
     .min(1, "Member name is required")
     .max(100, "Member name must be less than 100 characters"),
 });
+
+export type Member = z.infer<typeof MemberSchema>;
+
+// School Schema
+export const SchoolSchema = z.object({
+  name: z
+    .string()
+    .min(1, "School name is required")
+    .max(100, "School name must be less than 100 characters"),
+  picName: z
+    .string()
+    .max(100, "PIC Name must be less than 100 characters")
+    .optional()
+    .nullable(),
+  picEmail: z
+    .string()
+    .max(100, "PIC Email must be less than 100 characters")
+    .optional()
+    .nullable(),
+  address: z
+    .string()
+    .max(255, "Address must be less than 255 characters")
+    .optional()
+    .nullable(),
+});
+
+export type School = z.infer<typeof SchoolSchema>;

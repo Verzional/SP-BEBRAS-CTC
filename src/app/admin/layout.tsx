@@ -5,5 +5,9 @@ export default function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <Sidebar>{children}</Sidebar>;
+  return (
+    <Sidebar>
+      <div className="flex items-center justify-center h-full">{children}</div>
+    </Sidebar>
+  );
 }

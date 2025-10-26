@@ -156,7 +156,7 @@ export async function freezeContest() {
       team: {
         select: {
           id: true,
-          teamName: true,
+          name: true,
           score: true,
         },
       },

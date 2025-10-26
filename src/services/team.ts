@@ -1,6 +1,9 @@
+"use server";
+
 import prisma from "@/lib/prisma";
-import { TeamSchema, TeamCreationSchema } from "@/types/db";
+import { TeamSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function getAllTeams() {
   return await prisma.team.findMany({
@@ -20,51 +23,34 @@ export async function getTeamById(teamId: string) {
   });
 }
 
-export async function createTeam(formData: FormData) {
-  const rawData = {
-    name: formData.get("name") as string,
-    schoolId: formData.get("schoolId") as string,
-    memberName: formData.get("memberName") as string,
-  };
-
-  const result = TeamCreationSchema.safeParse(rawData);
+export async function createTeam(data: z.infer<typeof TeamSchema>) {
+  const result = TeamSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid team data");
+    return { error: "Invalid data submitted." };
   }
 
-  const team = await prisma.team.create({
-    data: {
-      name: result.data.name,
-      schoolId: result.data.schoolId,
-      members: {
-        create: [
-          {
-            name: result.data.memberName,
-          },
-        ],
-      },
-    },
-    include: {
-      members: true,
-    },
-  });
+  try {
+    const team = await prisma.team.create({
+      data: result.data,
+    });
 
-  revalidatePath("/admin/teams");
+    revalidatePath("/admin/teams");
 
-  return team;
+    return { success: true, team };
+  } catch (err) {
+    return { error: "Failed to create team: " + (err as Error).message };
+  }
 }
 
-export async function updateTeam(teamId: string, formData: FormData) {
-  const rawData = {
-    name: formData.get("name") as string,
-    schoolId: formData.get("schoolId") as string,
-  };
-
-  const result = TeamSchema.safeParse(rawData);
+export async function updateTeam(
+  teamId: string,
+  data: z.infer<typeof TeamSchema>
+) {
+  const result = TeamSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid team data");
+    throw new Error("Invalid data submitted.");
   }
 
   const team = await prisma.team.update({

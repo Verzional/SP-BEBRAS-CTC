@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  School,
   UserRound,
   UsersRound,
   CircleUserRound,
@@ -26,6 +27,21 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
+    {
+      title: "Schools",
+      url: "/admin",
+      icon: School,
+      items: [
+        {
+          title: "School List",
+          url: "/admin/schools",
+        },
+        {
+          title: "Create School",
+          url: "/admin/schools/create",
+        },
+      ],
+    },
     {
       title: "Members",
       url: "#",

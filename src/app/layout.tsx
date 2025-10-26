@@ -1,6 +1,7 @@
 import "./globals.css";
-import { Provider } from "@/components/layout/theme-provider";
+import { Toaster } from "@/components/layout/toaster";
 import { Background } from "@/components/layout/background";
+import { Provider } from "@/components/layout/theme-provider";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
@@ -34,6 +35,7 @@ export default function RootLayout({
           <Background />
           <ThemeToggle />
           {children}
+          <Toaster />
         </Provider>
       </body>
     </html>
