@@ -12,9 +12,10 @@ export const authConfig = {
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
 
       if (isAuthRoute) {
-        if (isLoggedIn) {
+        if (isLoggedIn && auth?.user?.role === "USER") {
           return Response.redirect(new URL("/", nextUrl));
         }
+
         return true;
       }
 

@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Bot, Settings2, SquareTerminal,  } from "lucide-react";
+import {
+  UserRound,
+  UsersRound,
+  CircleUserRound,
+  BadgeQuestionMark,
+  BadgeCheck,
+  ScanLine,
+} from "lucide-react";
 
 import { NavMain } from "@/components/layout/sidebar/NavMain";
 import { NavUser } from "@/components/layout/sidebar/NavUser";
@@ -20,89 +27,86 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
+      title: "Members",
       url: "#",
-      icon: SquareTerminal,
+      icon: UserRound,
+      items: [
+        {
+          title: "Member List",
+          url: "/admin/members",
+        },
+        {
+          title: "Create Member",
+          url: "/admin/members/create",
+        },
+      ],
+    },
+    {
+      title: "Teams",
+      url: "#",
+      icon: UsersRound,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Team List",
+          url: "/admin/teams",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "Create Team",
+          url: "/admin/teams/create",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Accounts",
       url: "#",
-      icon: Bot,
+      icon: CircleUserRound,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Account List",
+          url: "/admin/accounts",
         },
         {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
+          title: "Create Account",
+          url: "/admin/accounts/create",
         },
       ],
     },
     {
-      title: "Documentation",
+      title: "Questions",
       url: "#",
-      icon: BookOpen,
+      icon: BadgeQuestionMark,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Question List",
+          url: "/admin/questions",
         },
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Create Question",
+          url: "/admin/questions/create",
         },
       ],
     },
     {
-      title: "Settings",
+      title: "Answers",
       url: "#",
-      icon: Settings2,
+      icon: BadgeCheck,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Answer List",
+          url: "/admin/answers",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Create Answer",
+          url: "/admin/answers/create",
         },
       ],
+    },
+    {
+      title: "Scan",
+      url: "admin/scan",
+      icon: ScanLine,
+      isCollapsible: false,
     },
   ],
 };

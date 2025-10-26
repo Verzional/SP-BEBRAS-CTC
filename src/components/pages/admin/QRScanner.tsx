@@ -24,7 +24,7 @@ interface IDetectedBarcode {
   rawValue: string;
 }
 
-export default function QRScanner() {
+export function QRScanner() {
   const router = useRouter();
 
   const [error, setError] = useState<string | null>(null);

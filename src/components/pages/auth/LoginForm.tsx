@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
-export default function LoginForm({
+export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
