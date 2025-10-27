@@ -9,8 +9,8 @@ interface TeamEditPageProps {
 
 export default async function TeamEditPage({ params }: TeamEditPageProps) {
   const { id } = await params;
-  const schools = await getAllSchools();
   const team = await getTeamById(id);
+  const schools = await getAllSchools();
 
   if (!team) {
     notFound();
