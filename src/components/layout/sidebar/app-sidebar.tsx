@@ -61,7 +61,6 @@ const data = {
       title: "Teams",
       url: "#",
       icon: UsersRound,
-      isActive: true,
       items: [
         {
           title: "Team List",

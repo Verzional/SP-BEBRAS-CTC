@@ -7,7 +7,9 @@ export default function AdminLayout({
 }>) {
   return (
     <Sidebar>
-      <div className="flex items-center justify-center h-full">{children}</div>
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-full max-w-2xl space-y-4">{children}</div>
+      </div>
     </Sidebar>
   );
 }

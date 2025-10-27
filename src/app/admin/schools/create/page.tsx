@@ -1,5 +1,5 @@
-import { SchoolForm } from "@/components/admin/schools/school-form";
+import { SchoolCreateForm } from "@/components/admin/schools/school-create-form";
 
 export default function CreateSchoolPage() {
-  return <SchoolForm />;
+  return <SchoolCreateForm />;
 }

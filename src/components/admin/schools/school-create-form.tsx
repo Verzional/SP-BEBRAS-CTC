@@ -26,7 +26,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 
-export function SchoolForm() {
+export function SchoolCreateForm() {
   {
     const [isPending, startTransition] = useTransition();
 
@@ -62,6 +62,7 @@ export function SchoolForm() {
 
     return (
       <Card className="w-full sm:max-w-md">
+        {/* Card Header */}
         <CardHeader>
           <CardTitle>Create School</CardTitle>
           <CardDescription>Add a new school to the database.</CardDescription>
@@ -69,6 +70,7 @@ export function SchoolForm() {
         <CardContent>
           <form id="form-school" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
+              {/* School Name Field */}
               <Controller
                 name="name"
                 control={form.control}
@@ -92,6 +94,7 @@ export function SchoolForm() {
                   </Field>
                 )}
               />
+              {/* PIC Name Field */}
               <Controller
                 name="picName"
                 control={form.control}
@@ -115,6 +118,7 @@ export function SchoolForm() {
                   </Field>
                 )}
               />
+              {/* PIC Email Field */}
               <Controller
                 name="picEmail"
                 control={form.control}
@@ -138,6 +142,7 @@ export function SchoolForm() {
                   </Field>
                 )}
               />
+              {/* Address Field */}
               <Controller
                 name="address"
                 control={form.control}
@@ -165,6 +170,7 @@ export function SchoolForm() {
           </form>
         </CardContent>
         <CardFooter>
+          {/* Action Buttons */}
           <Field orientation="horizontal">
             <Button
               type="button"
