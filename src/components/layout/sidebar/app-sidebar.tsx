@@ -119,7 +119,7 @@ const data = {
     },
     {
       title: "Scan",
-      url: "admin/scan",
+      url: "/admin/scan",
       icon: ScanLine,
       isCollapsible: false,
     },

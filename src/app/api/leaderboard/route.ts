@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
           team: {
             select: {
               id: true,
-              teamName: true,
+              name: true,
               score: true,
             },
           },
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
       accountId: account.id,
       username: account.username,
       teamId: account.teamId,
-      teamName: account.team?.teamName,
+      teamName: account.team?.name,
       score: account.team?.score || 0,
     }));
 

@@ -36,7 +36,7 @@ export function SchoolDetail({ school }: SchoolDetailProps) {
             </Button>
             <Button
               variant="destructive"
-              size="icon-sm"    
+              size="icon-sm"
               className="hover:cursor-pointer"
               onClick={() => deleteSchool(school.id)}
             >

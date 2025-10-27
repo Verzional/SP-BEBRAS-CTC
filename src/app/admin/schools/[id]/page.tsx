@@ -1,6 +1,6 @@
-import { getSchoolById } from "@/services/school";
 import { notFound } from "next/navigation";
-import { SchoolDetail } from "@/components/admin/schools/school-detail";
+import { getSchoolById } from "@/services/school";
+import { SchoolDetail } from "@/components/admin/schools/detail";
 
 interface SchoolDetailPageProps {
   params: Promise<{ id: string }>;

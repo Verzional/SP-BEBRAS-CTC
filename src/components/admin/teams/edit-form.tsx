@@ -2,15 +2,16 @@
 
 import { z } from "zod";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { createTeam } from "@/services/team";
+import { updateTeam } from "@/services/team";
 import { TeamSchema } from "@/types/db";
-import { School } from "@/generated/client/client";
+import { Team, School } from "@/generated/client/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,31 +44,41 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface TeamFormProps {
+interface TeamEditFormProps {
+  team: Team;
   schools?: School[];
 }
 
-export function TeamForm({ schools = [] }: TeamFormProps) {
+export function TeamEditForm({ team, schools = [] }: TeamEditFormProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof TeamSchema>>({
     resolver: zodResolver(TeamSchema),
     defaultValues: {
-      name: "",
-      schoolId: "",
+      name: team.name,
+      schoolId: team.schoolId,
     },
   });
 
   function onSubmit(data: z.infer<typeof TeamSchema>) {
     startTransition(async () => {
-      const result = await createTeam(data);
+      try {
+        const payload = {
+          ...data,
+          schoolId: data.schoolId,
+        };
 
-      if (result.error) {
-        toast.error(result.error);
-      } else {
-        toast.success("Team created successfully!");
-        form.reset();
+        await updateTeam(team.id, payload);
+
+        toast.success("team updated successfully!");
+        router.push(`/admin/teams/${team.id}`);
+        router.refresh();
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update school"
+        );
       }
     });
   }
@@ -75,12 +86,15 @@ export function TeamForm({ schools = [] }: TeamFormProps) {
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
-        <CardTitle>Create Team</CardTitle>
-        <CardDescription>Add a new team to the competition.</CardDescription>
+        <CardTitle>Edit Team</CardTitle>
+        <CardDescription>
+          Update team information in the database.
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="form-team" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="form-team-edit" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
+            {/* Team Name Field */}
             <Controller
               name="name"
               control={form.control}
@@ -101,6 +115,7 @@ export function TeamForm({ schools = [] }: TeamFormProps) {
                 </Field>
               )}
             />
+            {/* School Select Field */}
             <Controller
               name="schoolId"
               control={form.control}
@@ -171,6 +186,7 @@ export function TeamForm({ schools = [] }: TeamFormProps) {
         </form>
       </CardContent>
       <CardFooter>
+        {/* Action Buttons */}
         <Field orientation="horizontal">
           <Button
             type="button"
@@ -180,7 +196,7 @@ export function TeamForm({ schools = [] }: TeamFormProps) {
           >
             Reset
           </Button>
-          <Button type="submit" form="form-team" disabled={isPending}>
+          <Button type="submit" form="form-team-edit" disabled={isPending}>
             Submit
           </Button>
         </Field>

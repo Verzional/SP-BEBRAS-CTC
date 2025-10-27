@@ -1,8 +1,9 @@
 import { getAllSchools } from "@/services/school";
-import { TeamForm } from "@/components/admin/teams/team-form";
+import { TeamCreateForm } from "@/components/admin/teams/create-form";
 
 export default async function CreateTeamPage() {
   const schools = await getAllSchools();
 
-  return <TeamForm schools={schools} />;
+  return <TeamCreateForm schools={schools} />;
 }
+  

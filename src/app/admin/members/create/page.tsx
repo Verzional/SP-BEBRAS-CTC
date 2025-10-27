@@ -1,5 +1,3 @@
-import { MemberForm } from "@/components/admin/member-form";
-
 export default function CreateMemberPage() {
-  return <MemberForm />;
+  return <div>This page is under construction</div>
 }

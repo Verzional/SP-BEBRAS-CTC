@@ -1,5 +1,15 @@
 import z from "zod";
+import { Prisma } from "@/generated/client/client";
 import { Difficulty } from "@/generated/client/enums";
+
+// Team
+export const teamInclude = {
+  school: true,
+} satisfies Prisma.TeamInclude;
+
+export type FullTeam = Prisma.TeamGetPayload<{
+  include: typeof teamInclude;
+}>;
 
 // Question Schema
 export const QuestionSchema = z.object({

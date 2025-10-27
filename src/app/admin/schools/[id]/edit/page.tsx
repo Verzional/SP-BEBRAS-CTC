@@ -1,14 +1,12 @@
-import { getSchoolById } from "@/services/school";
 import { notFound } from "next/navigation";
-import { SchoolEditForm } from "@/components/admin/schools/school-edit-form";
+import { getSchoolById } from "@/services/school";
+import { SchoolEditForm } from "@/components/admin/schools/edit-form";
 
 interface SchoolEditPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function SchoolEditPage({
-  params,
-}: SchoolEditPageProps) {
+export default async function SchoolEditPage({ params }: SchoolEditPageProps) {
   const { id } = await params;
   const school = await getSchoolById(id);
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { getQuestionForTeam } from "@/services/question";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
+
+import { getQuestionForTeam } from "@/services/question";
 
 interface IPoint {
   x: number;
@@ -57,7 +58,6 @@ export function QRScanner() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center mb-4">Scan Team QR Code</h1>
       <Scanner
         onScan={handleScan}
         onError={handleError}
