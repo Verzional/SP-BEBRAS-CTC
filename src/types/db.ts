@@ -28,6 +28,7 @@ export type FullQuestion = Prisma.QuestionGetPayload<{
 export const AnswerSchema = z.object({
   questionId: z.cuid2("Question is required"),
   content: z.string().min(1, "Content is required"),
+  isCorrect: z.boolean(),
 });
 
 export type Answer = z.infer<typeof AnswerSchema>;
@@ -116,6 +117,7 @@ export const AccountSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(100, "Password must be less than 100 characters"),
   role: z.enum(["USER", "ADMIN", "OPERATOR", "JUDGE"]),
+  teamId: z.string().optional(),
 });
 
 export type AccountFormData = z.infer<typeof AccountSchema>;

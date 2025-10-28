@@ -3,16 +3,21 @@
 import Image from "next/image";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { createAnswer } from "@/services/answer";
+import { updateAnswer } from "@/services/answer";
 import { saveImageMetadata, deleteImage } from "@/services/image";
 import { AnswerSchema } from "@/types/db";
-import { Question } from "@/generated/client/client";
+import {
+  Answer,
+  Question,
+  Image as ImageType,
+} from "@/generated/client/client";
 
 import { UploadWidget } from "@/components/layout/upload-widget";
 import { Button } from "@/components/ui/button";
@@ -47,23 +52,31 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface AnswerCreateFormProps {
+interface AnswerEditFormProps {
+  answer: Answer & { images?: ImageType[] };
   questions?: Question[];
 }
 
-export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
+export function AnswerEditForm({
+  answer,
+  questions = [],
+}: AnswerEditFormProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [uploadedImages, setUploadedImages] = useState<
     { url: string; publicId: string }[]
   >([]);
+  const [existingImages, setExistingImages] = useState<ImageType[]>(
+    answer.images || []
+  );
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
     defaultValues: {
-      content: "",
-      questionId: "",
-      isCorrect: false,
+      content: answer.content,
+      questionId: answer.questionId,
+      isCorrect: answer.isCorrect,
     },
   });
 
@@ -78,7 +91,7 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
     toast.info("Image uploaded, will be linked on submit.");
   }
 
-  async function handleRemoveImage(publicIdToRemove: string) {
+  async function handleRemoveNewImage(publicIdToRemove: string) {
     const result = await deleteImage(publicIdToRemove);
     if (result.success) {
       setUploadedImages((prev) =>
@@ -90,50 +103,63 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
     }
   }
 
-  function onSubmit(data: Omit<z.infer<typeof AnswerSchema>, "image">) {
+  async function handleRemoveExistingImage(imageId: string) {
+    const imageToRemove = existingImages.find((img) => img.id === imageId);
+    if (!imageToRemove) return;
+
+    const result = await deleteImage(imageToRemove.publicId);
+    if (result.success) {
+      setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+  }
+
+  function onSubmit(data: z.infer<typeof AnswerSchema>) {
     startTransition(async () => {
-      const result = await createAnswer(data);
+      try {
+        await updateAnswer(answer.id, data);
 
-      if (result.error || !result.answer) {
-        toast.error(result.error || "Failed to create answer.");
+        let allImagesSaved = true;
         for (const img of uploadedImages) {
-          await deleteImage(img.publicId);
-        }
-        return;
-      }
-
-      const answerId = result.answer.id;
-      let allImagesSaved = true;
-
-      for (const img of uploadedImages) {
-        const metaResult = await saveImageMetadata(
-          { public_id: img.publicId, secure_url: img.url },
-          answerId,
-          "answer"
-        );
-        if (!metaResult.success) {
-          allImagesSaved = false;
-          toast.error(
-            `Failed to link image ${img.publicId}: ${metaResult.error}`
+          const metaResult = await saveImageMetadata(
+            { public_id: img.publicId, secure_url: img.url },
+            answer.id,
+            "answer"
           );
+          if (!metaResult.success) {
+            allImagesSaved = false;
+            toast.error(
+              `Failed to link image ${img.publicId}: ${metaResult.error}`
+            );
+          }
         }
-      }
 
-      if (allImagesSaved) {
-        toast.success("Answer created successfully!");
-        form.reset();
-        setUploadedImages([]);
-      } else {
-        toast.warning("Answer created, but some images failed to link.");
+        if (allImagesSaved) {
+          toast.success("answer updated successfully!");
+          router.push(`/admin/questions`);
+          router.refresh();
+        } else {
+          toast.warning("answer updated, but some images failed to link.");
+        }
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update question"
+        );
       }
     });
+  }
+
+  function handleCancel() {
+    router.push(`/admin/questions`);
   }
 
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader>
-        <CardTitle>Create Answer</CardTitle>
-        <CardDescription>Add a new answer to the question.</CardDescription>
+        <CardTitle>Edit Answer</CardTitle>
+        <CardDescription>Update the answer details.</CardDescription>
       </CardHeader>
       <CardContent>
         <form id="form-answer" onSubmit={form.handleSubmit(onSubmit)}>
@@ -191,7 +217,7 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-full p-0" align="start">
                       <Command>
-                        <CommandInput placeholder="Search questions..." />
+                        <CommandInput placeholder="Search teams..." />
                         <CommandList>
                           <CommandEmpty>No question found.</CommandEmpty>
                           <CommandGroup>
@@ -252,9 +278,42 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
                 </Field>
               )}
             />
-            {/* Image Field */}
+            {/* Existing Images */}
+            {existingImages.length > 0 && (
+              <Field>
+                <FieldLabel>Existing Images</FieldLabel>
+                <div className="space-y-2">
+                  {existingImages.map((img) => (
+                    <div
+                      key={img.id}
+                      className="flex items-center space-x-3 p-2 border rounded-md bg-gray-50"
+                    >
+                      <Image
+                        src={img.url}
+                        alt="Question image"
+                        width={60}
+                        height={60}
+                        className="object-cover rounded border"
+                      />
+                      <span className="text-sm text-gray-600 flex-1 truncate">
+                        {img.publicId.split("/").pop()}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingImage(img.id)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1"
+                        disabled={isPending}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Field>
+            )}
+            {/* New Images Upload */}
             <Field>
-              <FieldLabel>Question Image (Optional)</FieldLabel>
+              <FieldLabel>Add New Images (Optional)</FieldLabel>
               <UploadWidget
                 onUploadSuccess={handleImageUpload}
                 folder="bebras/questions"
@@ -279,7 +338,7 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleRemoveImage(img.publicId)}
+                        onClick={() => handleRemoveNewImage(img.publicId)}
                         className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1"
                         disabled={isPending}
                       >
@@ -299,13 +358,21 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
           <Button
             type="button"
             variant="outline"
+            onClick={handleCancel}
+            disabled={isPending}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => form.reset()}
             disabled={isPending}
           >
             Reset
           </Button>
           <Button type="submit" form="form-answer" disabled={isPending}>
-            Submit
+            Update
           </Button>
         </Field>
       </CardFooter>

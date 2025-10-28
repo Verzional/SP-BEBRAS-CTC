@@ -5,6 +5,12 @@ import { AnswerSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+export async function getAnswerById(answerId: string) {
+  return await prisma.answer.findUnique({
+    where: { id: answerId },
+  });
+}
+
 export async function getAnswersByQuestionId(questionId: string) {
   return await prisma.answer.findMany({
     where: { questionId },
@@ -41,17 +47,21 @@ export async function updateAnswer(
   const result = AnswerSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid answer data submitted.");
+    return { error: "Invalid answer data submitted." };
   }
 
-  const answer = await prisma.answer.update({
-    where: { id: answerId },
-    data: result.data,
-  });
+  try {
+    const answer = await prisma.answer.update({
+      where: { id: answerId },
+      data: result.data,
+    });
 
-  revalidatePath("/admin/answers");
+    revalidatePath("/admin/answers");
 
-  return answer;
+    return { success: true, answer };
+  } catch (err) {
+    return { error: "Failed to update answer: " + (err as Error).message };
+  }
 }
 
 export async function deleteAnswer(answerId: string) {
