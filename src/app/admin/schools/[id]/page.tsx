@@ -1,14 +1,11 @@
 import { notFound } from "next/navigation";
 import { getSchoolById } from "@/services/school";
+import { IDParams } from "@/types/id";
 import { SchoolDetail } from "@/components/admin/schools/detail";
-
-interface SchoolDetailPageProps {
-  params: Promise<{ id: string }>;
-}
 
 export default async function SchoolDetailPage({
   params,
-}: SchoolDetailPageProps) {
+}: IDParams) {
   const { id } = await params;
   const school = await getSchoolById(id);
 

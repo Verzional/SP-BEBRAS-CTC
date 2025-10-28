@@ -1,3 +1,5 @@
+import { QuestionCreateForm } from "@/components/admin/questions/create-form";
+
 export default function CreateQuestionPage() {
-    return <div>Create Question Page - Under Construction</div>;
+  return <QuestionCreateForm />;
 }

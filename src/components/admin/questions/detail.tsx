@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteQuestion } from "@/services/question";
+import { difficultyColors, difficultyLabels } from "@/utils/difficulty";
 import { FullQuestion } from "@/types/db";
 
 import { Button } from "@/components/ui/button";
@@ -22,18 +23,6 @@ import {
 interface QuestionDetailProps {
   question: FullQuestion;
 }
-
-const difficultyColors = {
-  EASY: "bg-green-500 hover:bg-green-600",
-  MEDIUM: "bg-yellow-500 hover:bg-yellow-600",
-  HARD: "bg-red-500 hover:bg-red-600",
-} as const;
-
-const difficultyLabels = {
-  EASY: "Easy",
-  MEDIUM: "Medium",
-  HARD: "Hard",
-} as const;
 
 export function QuestionDetail({ question }: QuestionDetailProps) {
   return (

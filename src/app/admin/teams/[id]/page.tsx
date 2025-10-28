@@ -1,12 +1,9 @@
 import { notFound } from "next/navigation";
 import { getTeamById } from "@/services/team";
+import { IDParams } from "@/types/id";
 import { TeamDetail } from "@/components/admin/teams/detail";
 
-interface TeamDetailPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function TeamDetailPage({ params }: TeamDetailPageProps) {
+export default async function TeamDetailPage({ params }: IDParams) {
   const { id } = await params;
   const team = await getTeamById(id);
 

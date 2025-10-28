@@ -173,7 +173,7 @@ export function QuestionCreateForm() {
             />
             {/* Image Field */}
             <Field>
-              <FieldLabel>Question Images (Optional)</FieldLabel>
+              <FieldLabel>Question Image (Optional)</FieldLabel>
               <UploadWidget
                 onUploadSuccess={handleImageUpload}
                 folder="bebras/questions"
