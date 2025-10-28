@@ -9,11 +9,20 @@ export const QuestionSchema = z.object({
     .min(1, "Title is required")
     .max(255, "Title must be less than 255 characters"),
   description: z.string().min(1, "Description is required"),
-  image: z.url("Image must be a valid URL").nullable().optional(),
   difficulty: z.enum(Difficulty, "Difficulty is required and must be valid"),
 });
 
 export type Question = z.infer<typeof QuestionSchema>;
+
+// Question Include
+export const questionInclude = {
+  images: true,
+  answers: true,
+} satisfies Prisma.QuestionInclude;
+
+export type FullQuestion = Prisma.QuestionGetPayload<{
+  include: typeof questionInclude;
+}>;
 
 // Answer Schema
 export const AnswerSchema = z.object({

@@ -64,11 +64,16 @@ export async function updateMember(
 }
 
 export async function deleteMember(memberId: string) {
-  const deleted = await prisma.member.delete({
-    where: { id: memberId },
-  });
+  try {
+    const deleted = await prisma.member.delete({
+      where: { id: memberId },
+    });
 
-  revalidatePath("/admin/members");
+    revalidatePath("/admin/members");
 
-  return deleted;
+    return { success: true, deleted };
+  } catch (err) {
+    console.error("Failed to delete member:", err);
+    return { success: false, error: "Failed to delete member." };
+  }
 }

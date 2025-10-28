@@ -15,6 +15,7 @@ enum Role {
   ADMIN
   OPERATOR
   JUDGE
+  MASTER
 }
 
 model Account {
@@ -100,7 +101,6 @@ model Question {
   id          String     @id @default(cuid())
   title       String
   description String
-  image       String?
   code        Int        @unique @default(autoincrement())
   difficulty  Difficulty
 

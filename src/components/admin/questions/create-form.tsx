@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createQuestion } from "@/services/question";
+import { saveImageMetadata, deleteImage } from "@/services/image";
 import { QuestionSchema } from "@/types/db";
 
 import { UploadWidget } from "@/components/layout/upload-widget";
@@ -37,41 +38,77 @@ import {
 
 export function QuestionCreateForm() {
   const [isPending, startTransition] = useTransition();
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [imagePublicId, setImagePublicId] = useState<string>("");
+  const [uploadedImages, setUploadedImages] = useState<
+    { url: string; publicId: string }[]
+  >([]);
 
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
       title: "",
       description: "",
-      image: "",
       difficulty: "EASY",
     },
   });
 
   function handleImageUpload(url: string, publicId?: string) {
-    setImageUrl(url);
-    setImagePublicId(publicId || "");
-    form.setValue("image", url);
+    if (!publicId) {
+      toast.error("Image upload failed: missing public ID.");
+      return;
+    }
+
+    const newImage = { url, publicId };
+    setUploadedImages((prev) => [...prev, newImage]);
+    toast.info("Image uploaded, will be linked on submit.");
   }
 
-  function onSubmit(data: z.infer<typeof QuestionSchema>) {
+  async function handleRemoveImage(publicIdToRemove: string) {
+    const result = await deleteImage(publicIdToRemove);
+    if (result.success) {
+      setUploadedImages((prev) =>
+        prev.filter((img) => img.publicId !== publicIdToRemove)
+      );
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+  }
+
+  function onSubmit(data: Omit<z.infer<typeof QuestionSchema>, "image">) {
     startTransition(async () => {
-      const payload = {
-        ...data,
-        image: imageUrl || null,
-      };
+      const result = await createQuestion(data);
 
-      const result = await createQuestion(payload);
+      if (result.error || !result.question) {
+        toast.error(result.error || "Failed to create question.");
+        for (const img of uploadedImages) {
+          await deleteImage(img.publicId);
+        }
+        return;
+      }
 
-      if (result.error) {
-        toast.error(result.error);
-      } else {
+      const questionId = result.question.id;
+      let allImagesSaved = true;
+
+      for (const img of uploadedImages) {
+        const metaResult = await saveImageMetadata(
+          { public_id: img.publicId, secure_url: img.url },
+          questionId,
+          "question"
+        );
+        if (!metaResult.success) {
+          allImagesSaved = false;
+          toast.error(
+            `Failed to link image ${img.publicId}: ${metaResult.error}`
+          );
+        }
+      }
+
+      if (allImagesSaved) {
         toast.success("Question created successfully!");
         form.reset();
-        setImageUrl("");
-        setImagePublicId("");
+        setUploadedImages([]);
+      } else {
+        toast.warning("Question created, but some images failed to link.");
       }
     });
   }
@@ -136,30 +173,39 @@ export function QuestionCreateForm() {
             />
             {/* Image Field */}
             <Field>
-              <FieldLabel>Question Image (Optional)</FieldLabel>
+              <FieldLabel>Question Images (Optional)</FieldLabel>
               <UploadWidget
                 onUploadSuccess={handleImageUpload}
                 folder="bebras/questions"
                 allowedFormats={["png", "jpeg", "jpg"]}
               />
-              {imageUrl && (
-                <div className="mt-2 flex items-center space-x-2">
-                  <Image
-                    src={imageUrl}
-                    alt="Uploaded"
-                    className="w-20 h-20 object-cover rounded border"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImageUrl("");
-                      setImagePublicId("");
-                      form.setValue("image", "");
-                    }}
-                    className="text-red-600 hover:text-red-800 text-sm"
-                  >
-                    Remove
-                  </button>
+              {uploadedImages.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  {uploadedImages.map((img) => (
+                    <div
+                      key={img.publicId}
+                      className="flex items-center space-x-3 p-2 border rounded-md"
+                    >
+                      <Image
+                        src={img.url}
+                        alt="Uploaded"
+                        width={60}
+                        height={60}
+                        className="object-cover rounded border"
+                      />
+                      <span className="text-sm text-gray-600 flex-1 truncate">
+                        {img.publicId.split("/").pop()}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(img.publicId)}
+                        className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1"
+                        disabled={isPending}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </Field>
@@ -206,8 +252,7 @@ export function QuestionCreateForm() {
             variant="outline"
             onClick={() => {
               form.reset();
-              setImageUrl("");
-              setImagePublicId("");
+              setUploadedImages([]);
             }}
             disabled={isPending}
           >

@@ -11,6 +11,7 @@ export async function getAllQuestions() {
       createdAt: "desc",
     },
     include: {
+      images: true,
       answers: true,
     },
   });
@@ -19,7 +20,10 @@ export async function getAllQuestions() {
 export async function getQuestionById(questionId: string) {
   return await prisma.question.findUnique({
     where: { id: questionId },
-    include: { answers: true },
+    include: {
+      images: true,
+      answers: true,
+    },
   });
 }
 
@@ -64,13 +68,18 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(questionId: string) {
-  const deleted = await prisma.question.delete({
-    where: { id: questionId },
-  });
+  try {
+    const deleted = await prisma.question.delete({
+      where: { id: questionId },
+    });
 
-  revalidatePath("/admin/questions");
+    revalidatePath("/admin/questions");
 
-  return deleted;
+    return { success: true, deleted };
+  } catch (err) {
+    console.error("Failed to delete question:", err);
+    return { success: false, error: "Failed to delete question." };
+  }
 }
 
 async function getRandomUnsolvedQuestion(teamId: string) {

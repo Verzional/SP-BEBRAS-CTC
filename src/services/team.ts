@@ -64,11 +64,16 @@ export async function updateTeam(
 }
 
 export async function deleteTeam(teamId: string) {
-  const deleted = await prisma.team.delete({
-    where: { id: teamId },
-  });
+  try {
+    const deleted = await prisma.team.delete({
+      where: { id: teamId },
+    });
 
-  revalidatePath("/admin/teams");
+    revalidatePath("/admin/teams");
 
-  return deleted;
+    return { success: true, deleted };
+  } catch (err) {
+    console.error("Failed to delete team:", err);
+    return { success: false, error: "Failed to delete team." };
+  }
 }

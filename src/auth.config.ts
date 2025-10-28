@@ -10,6 +10,7 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const isAuthRoute = nextUrl.pathname === "/auth/login";
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
+      const isMasterRoute = nextUrl.pathname.startsWith("/master");
 
       if (isAuthRoute) {
         if (isLoggedIn && auth?.user?.role === "USER") {
@@ -19,11 +20,22 @@ export const authConfig = {
         return true;
       }
 
-      if (!isLoggedIn) {
+      if (isAdminRoute) {
+        if (isLoggedIn || auth?.user?.role !== "ADMIN") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      if (isMasterRoute) {
+        if (isLoggedIn && auth?.user?.role === "MASTER") {
+          return true;
+        }
         return false;
       }
 
-      if (isAdminRoute && auth?.user?.role !== "ADMIN") {
+      if (!isLoggedIn) {
         return false;
       }
 

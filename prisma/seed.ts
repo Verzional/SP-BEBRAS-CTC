@@ -7,7 +7,7 @@ const adminAccounts = [
     name: "Valen",
     username: "valen",
     password: "12345678",
-    role: Role.ADMIN,
+    role: Role.MASTER,
   },
 ];
 
