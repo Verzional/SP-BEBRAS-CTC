@@ -7,7 +7,6 @@ import {
   UsersRound,
   CircleUserRound,
   BadgeQuestionMark,
-  BadgeCheck,
   ScanLine,
 } from "lucide-react";
 
@@ -99,21 +98,6 @@ const data = {
         {
           title: "Create Question",
           url: "/admin/questions/create",
-        },
-      ],
-    },
-    {
-      title: "Answers",
-      url: "#",
-      icon: BadgeCheck,
-      items: [
-        {
-          title: "Answer List",
-          url: "/admin/answers",
-        },
-        {
-          title: "Create Answer",
-          url: "/admin/answers/create",
         },
       ],
     },

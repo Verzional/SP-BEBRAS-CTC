@@ -3,38 +3,45 @@
 import prisma from "../lib/prisma";
 import { AnswerSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
-export async function createAnswer(formData: FormData) {
-  const rawData = {
-    content: formData.get("content") as string,
-    questionId: formData.get("questionId") as string,
-  };
-
-  const result = AnswerSchema.safeParse(rawData);
-
-  if (!result.success) {
-    throw new Error("Invalid answer data");
-  }
-
-  const answer = await prisma.answer.create({
-    data: result.data,
+export async function getAnswersByQuestionId(questionId: string) {
+  return await prisma.answer.findMany({
+    where: { questionId },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
-
-  revalidatePath("/admin/questions");
-  revalidatePath(`/admin/questions/${formData.get("questionId") as string}`);
-
-  return answer;
 }
 
-export async function updateAnswer(answerId: string, formData: FormData) {
-  const rawData = {
-    content: formData.get("content") as string,
-    questionId: formData.get("questionId") as string,
-  };
+export async function createAnswer(data: z.infer<typeof AnswerSchema>) {
+  const result = AnswerSchema.safeParse(data);
 
-  const result = AnswerSchema.safeParse(rawData);
   if (!result.success) {
-    throw new Error("Invalid answer data");
+    throw new Error("Invalid answer data submitted");
+  }
+
+  try {
+    const answer = await prisma.answer.create({
+      data: result.data,
+    });
+
+    revalidatePath("/admin/questions");
+
+    return { success: true, answer: answer };
+  } catch (err) {
+    return { error: "Failed to create answer: " + (err as Error).message };
+  }
+}
+
+export async function updateAnswer(
+  answerId: string,
+  data: z.infer<typeof AnswerSchema>
+) {
+  const result = AnswerSchema.safeParse(data);
+
+  if (!result.success) {
+    throw new Error("Invalid answer data submitted.");
   }
 
   const answer = await prisma.answer.update({
@@ -42,18 +49,22 @@ export async function updateAnswer(answerId: string, formData: FormData) {
     data: result.data,
   });
 
-  revalidatePath("/admin/questions");
-  revalidatePath(`/admin/questions/${formData.get("questionId") as string}`);
+  revalidatePath("/admin/answers");
 
   return answer;
 }
 
 export async function deleteAnswer(answerId: string) {
-  const deleted = await prisma.answer.delete({
-    where: { id: answerId },
-  });
+  try {
+    const deleted = await prisma.answer.delete({
+      where: { id: answerId },
+    });
 
-  revalidatePath("/admin/questions");
+    revalidatePath("/admin/questions");
 
-  return deleted;
+    return { success: true, deleted };
+  } catch (err) {
+    console.error("Failed to delete answer:", err);
+    return { success: false, error: "Failed to delete answer." };
+  }
 }

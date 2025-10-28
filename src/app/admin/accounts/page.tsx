@@ -1,3 +1,8 @@
-export default function AccountsPage() {
-    return <div>Accounts Page - Under Construction</div>;
+import { getAllAccounts } from "@/services/account";
+import { AccountList } from "@/components/admin/accounts/list";
+
+export default async function AccountsPage() {
+  const accounts = await getAllAccounts();
+
+  return <AccountList accounts={accounts} />;
 }
