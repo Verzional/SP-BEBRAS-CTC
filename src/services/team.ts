@@ -27,7 +27,7 @@ export async function createTeam(data: z.infer<typeof TeamSchema>) {
   const result = TeamSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: "Invalid data submitted." };
+    return { error: "Invalid team data submitted." };
   }
 
   try {
@@ -50,7 +50,7 @@ export async function updateTeam(
   const result = TeamSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid data submitted.");
+    throw new Error("Invalid team data submitted.");
   }
 
   const team = await prisma.team.update({

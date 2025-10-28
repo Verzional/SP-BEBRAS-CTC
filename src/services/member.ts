@@ -27,7 +27,7 @@ export async function createMember(data: z.infer<typeof MemberSchema>) {
   const result = MemberSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: "Invalid data submitted." };
+    return { error: "Invalid member data submitted." };
   }
 
   try {
@@ -50,7 +50,7 @@ export async function updateMember(
   const result = MemberSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid data submitted.");
+    throw new Error("Invalid member data submitted.");
   }
 
   const member = await prisma.member.update({

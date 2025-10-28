@@ -23,7 +23,7 @@ export async function createSchool(data: z.infer<typeof SchoolSchema>) {
   const result = SchoolSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: "Invalid data submitted." };
+    return { error: "Invalid school data submitted." };
   }
 
   try {
@@ -46,7 +46,7 @@ export async function updateSchool(
   const result = SchoolSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid data submitted.");
+    throw new Error("Invalid school data submitted.");
   }
 
   const school = await prisma.school.update({

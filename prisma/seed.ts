@@ -5,8 +5,8 @@ import { hashSync } from "@node-rs/bcrypt";
 const adminAccounts = [
   {
     name: "Valen",
-    username: "valenAdmin",
-    password: "valenAdmin123",
+    username: "valen",
+    password: "12345678",
     role: Role.ADMIN,
   },
 ];

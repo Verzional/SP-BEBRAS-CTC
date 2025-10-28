@@ -101,11 +101,13 @@ model Question {
   title       String
   description String
   image       String?
+  code        Int        @unique @default(autoincrement())
   difficulty  Difficulty
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  images   Image[]
   answers  Answer[]
   solvedBy SolvedQuestion[]
 }
@@ -118,6 +120,8 @@ model Answer {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  images Image[]
 
   question Question @relation(fields: [questionId], references: [id])
 }
@@ -132,6 +136,20 @@ model SolvedQuestion {
   question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
 
   @@unique([teamId, questionId])
+}
+
+model Image {
+  id       String @id @default(cuid())
+  url      String
+  publicId String @unique
+
+  questionId String?
+  answerId   String?
+
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer   Answer?   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 // Contest Models //

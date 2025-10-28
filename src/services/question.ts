@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { QuestionSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function getAllQuestions() {
   return await prisma.question.findMany({
@@ -22,39 +23,34 @@ export async function getQuestionById(questionId: string) {
   });
 }
 
-export async function createQuestion(formData: FormData) {
-  const rawData = {
-    title: formData.get("title") as string,
-    description: formData.get("description") as string,
-    image: formData.get("image") as string,
-  };
-
-  const result = QuestionSchema.safeParse(rawData);
+export async function createQuestion(data: z.infer<typeof QuestionSchema>) {
+  const result = QuestionSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid question data");
+    throw new Error("Invalid question data submitted");
   }
 
-  const question = await prisma.question.create({
-    data: result.data,
-  });
+  try {
+    const question = await prisma.question.create({
+      data: result.data,
+    });
 
-  revalidatePath("/admin/questions");
+    revalidatePath("/admin/questions");
 
-  return question;
+    return { success: true, question: question };
+  } catch (err) {
+    return { error: "Failed to create question: " + (err as Error).message };
+  }
 }
 
-export async function updateQuestion(questionId: string, formData: FormData) {
-  const rawData = {
-    title: formData.get("title") as string,
-    description: formData.get("description") as string,
-    image: formData.get("image") as string,
-  };
-
-  const result = QuestionSchema.safeParse(rawData);
+export async function updateQuestion(
+  questionId: string,
+  data: z.infer<typeof QuestionSchema>
+) {
+  const result = QuestionSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid question data");
+    throw new Error("Invalid question data submitted.");
   }
 
   const question = await prisma.question.update({
@@ -63,7 +59,6 @@ export async function updateQuestion(questionId: string, formData: FormData) {
   });
 
   revalidatePath("/admin/questions");
-  revalidatePath(`/admin/questions/${questionId}`);
 
   return question;
 }
