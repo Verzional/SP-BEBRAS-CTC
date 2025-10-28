@@ -9,7 +9,7 @@
     "lint": "eslint",
     "addcn": "pnpm dlx shadcn@latest add",
     "lintcn": "pnpm dlx compadcn lint",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate --no-engine",
     "prisma:migrate": "prisma migrate dev",
     "prisma:reset": "prisma migrate reset",
     "prisma:deploy": "prisma migrate deploy",
