@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { MemberSchema } from "@/types/db";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 export async function getAllMembers() {
   return await prisma.member.findMany({
@@ -22,37 +23,34 @@ export async function getMemberById(memberId: string) {
   });
 }
 
-export async function createMember(formData: FormData) {
-  const rawData = {
-    name: formData.get("name") as string,
-    teamId: formData.get("teamId") as string,
-  };
-
-  const result = MemberSchema.safeParse(rawData);
+export async function createMember(data: z.infer<typeof MemberSchema>) {
+  const result = MemberSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid member data");
+    return { error: "Invalid data submitted." };
   }
 
-  const member = await prisma.member.create({
-    data: result.data,
-  });
+  try {
+    const member = await prisma.member.create({
+      data: result.data,
+    });
 
-  revalidatePath("/admin/members");
+    revalidatePath("/admin/members");
 
-  return member;
+    return { success: true, member: member };
+  } catch (err) {
+    return { error: "Failed to create member: " + (err as Error).message };
+  }
 }
 
-export async function updateMember(memberId: string, formData: FormData) {
-  const rawData = {
-    name: formData.get("name") as string,
-    teamId: formData.get("teamId") as string,
-  };
-
-  const result = MemberSchema.safeParse(rawData);
+export async function updateMember(
+  memberId: string,
+  data: z.infer<typeof MemberSchema>
+) {
+  const result = MemberSchema.safeParse(data);
 
   if (!result.success) {
-    throw new Error("Invalid member data");
+    throw new Error("Invalid data submitted.");
   }
 
   const member = await prisma.member.update({

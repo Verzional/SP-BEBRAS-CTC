@@ -2,15 +2,6 @@ import z from "zod";
 import { Prisma } from "@/generated/client/client";
 import { Difficulty } from "@/generated/client/enums";
 
-// Team
-export const teamInclude = {
-  school: true,
-} satisfies Prisma.TeamInclude;
-
-export type FullTeam = Prisma.TeamGetPayload<{
-  include: typeof teamInclude;
-}>;
-
 // Question Schema
 export const QuestionSchema = z.object({
   title: z
@@ -43,6 +34,15 @@ export const TeamSchema = z.object({
 
 export type Team = z.infer<typeof TeamSchema>;
 
+// Team Include
+export const teamInclude = {
+  school: true,
+} satisfies Prisma.TeamInclude;
+
+export type FullTeam = Prisma.TeamGetPayload<{
+  include: typeof teamInclude;
+}>;
+
 // Member Schema
 export const MemberSchema = z.object({
   teamId: z.cuid2("Team is required"),
@@ -53,6 +53,15 @@ export const MemberSchema = z.object({
 });
 
 export type Member = z.infer<typeof MemberSchema>;
+
+// Member Include
+export const memberInclude = {
+  team: true,
+} satisfies Prisma.MemberInclude;
+
+export type FullMember = Prisma.MemberGetPayload<{
+  include: typeof memberInclude;
+}>;
 
 // School Schema
 export const SchoolSchema = z.object({
