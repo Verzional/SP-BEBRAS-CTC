@@ -45,7 +45,7 @@ model Team {
   account         Account?
   members         Member[]
   posts           Post[]
-  solvedQuestions SolvedQuestion[]
+  submissions     Submission[]
 
   school School @relation(fields: [schoolId], references: [id])
 }
@@ -109,14 +109,14 @@ model Question {
 
   images   Image[]
   answers  Answer[]
-  solvedBy SolvedQuestion[]
+  submission Submission[]
 }
 
 model Answer {
   id         String  @id @default(cuid())
   content    String
   questionId String
-  isCorrect  Boolean @default(false)
+  correct    Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -126,10 +126,12 @@ model Answer {
   question Question @relation(fields: [questionId], references: [id])
 }
 
-model SolvedQuestion {
+model Submission {
   id         String   @id @default(cuid())
   teamId     String
   questionId String
+  correct    Boolean @default(false)
+
   createdAt  DateTime @default(now())
 
   team     Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
