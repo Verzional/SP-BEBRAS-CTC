@@ -31,8 +31,8 @@ export async function cleanupOrphanedImages(
   try {
     const cloudinaryImages = await cloudinary.api.resources({
       type: "upload",
-      prefix: folder, 
-      max_results: 500, 
+      prefix: folder,
+      max_results: 500,
     });
 
     const dbImages = await prisma.image.findMany({

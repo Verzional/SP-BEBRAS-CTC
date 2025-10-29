@@ -136,3 +136,33 @@ export async function getQuestionForTeam(teamId: string) {
   }
 }
 
+export async function checkTeamSubmission(
+  teamId: string,
+  questionId: string,
+  answerId: string
+) {
+  try {
+    const correctAnswer = await prisma.answer.findFirst({
+      where: { questionId: questionId, correct: true },
+    });
+
+    if (!correctAnswer) {
+      return { error: "No correct answer found for this question." };
+    }
+
+    const isCorrect = correctAnswer.id === answerId;
+
+    await prisma.submission.create({
+      data: {
+        teamId: teamId,
+        questionId: questionId,
+        correct: isCorrect,
+      },
+    });
+
+    return { correct: isCorrect };
+  } catch (err) {
+    console.error("Error checking team submission: ", err);
+    return { error: "An unexpected server error occurred." };
+  }
+}
