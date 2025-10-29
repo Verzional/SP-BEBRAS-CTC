@@ -150,17 +150,17 @@ export async function checkTeamSubmission(
       return { error: "No correct answer found for this question." };
     }
 
-    const isCorrect = correctAnswer.id === answerId;
+    const correct = correctAnswer.id === answerId;
 
     await prisma.submission.create({
       data: {
         teamId: teamId,
         questionId: questionId,
-        correct: isCorrect,
+        correct: correct,
       },
     });
 
-    return { correct: isCorrect };
+    return { correct: correct };
   } catch (err) {
     console.error("Error checking team submission: ", err);
     return { error: "An unexpected server error occurred." };

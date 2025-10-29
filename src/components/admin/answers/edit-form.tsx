@@ -76,7 +76,7 @@ export function AnswerEditForm({
     defaultValues: {
       content: answer.content,
       questionId: answer.questionId,
-      isCorrect: answer.isCorrect,
+      correct: answer.correct,
     },
   });
 
@@ -257,7 +257,7 @@ export function AnswerEditForm({
             />
             {/* Is Correct Switch Field */}
             <Controller
-              name="isCorrect"
+              name="correct"
               control={form.control}
               render={({ field }) => (
                 <Field orientation="horizontal">

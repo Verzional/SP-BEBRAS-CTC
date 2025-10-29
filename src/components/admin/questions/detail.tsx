@@ -121,7 +121,7 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                   <div
                     key={answer.id}
                     className={`p-3 rounded-md border ${
-                      answer.isCorrect
+                      answer.correct
                         ? "bg-green-50 border-green-200"
                         : "bg-gray-50"
                     }`}
@@ -132,7 +132,7 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                           <span className="text-xs font-medium text-muted-foreground">
                             Option {String.fromCharCode(65 + index)}
                           </span>
-                          {answer.isCorrect && (
+                          {answer.correct && (
                             <Badge variant="default" className="text-xs">
                               Correct Answer
                             </Badge>

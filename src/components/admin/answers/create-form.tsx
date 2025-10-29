@@ -63,7 +63,7 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
     defaultValues: {
       content: "",
       questionId: "",
-      isCorrect: false,
+      correct: false,
     },
   });
 
@@ -231,7 +231,7 @@ export function AnswerCreateForm({ questions = [] }: AnswerCreateFormProps) {
             />
             {/* Is Correct Switch Field */}
             <Controller
-              name="isCorrect"
+              name="correct"
               control={form.control}
               render={({ field }) => (
                 <Field orientation="horizontal">
