@@ -83,12 +83,12 @@ export async function deleteQuestion(questionId: string) {
 }
 
 async function getRandomUnsolvedQuestion(teamId: string) {
-  const solvedQuestionRecords = await prisma.solvedQuestion.findMany({
+  const submissions = await prisma.submission.findMany({
     where: { teamId: teamId },
     select: { questionId: true },
   });
 
-  const solvedQuestionIds = solvedQuestionRecords.map((q) => q.questionId);
+  const solvedQuestionIds = submissions.map((q) => q.questionId);
 
   const whereClause = {
     id: { notIn: solvedQuestionIds },
