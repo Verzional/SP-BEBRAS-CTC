@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
@@ -19,8 +18,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
-
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,17 +39,19 @@ export function LoginForm({
 
       if (result?.error) {
         setError("Invalid username or password.");
-        console.error("Login Error: ", result.error);
+        console.error("Login Error:", result.error);
+        setLoading(false);
       } else if (result?.ok) {
-        router.push("/dashboard");
-        router.refresh();
+        // Don't set loading to false - let the navigation happen
+        // Force navigation to home, middleware will redirect to appropriate page
+        window.location.href = "/";
       } else {
-        setError("An unknown error occured during login.");
+        setError("An unknown error occurred during login.");
+        setLoading(false);
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
-      console.error("Unexpected Login Error: ", err);
-    } finally {
+      console.error("Unexpected Login Error:", err);
       setLoading(false);
     }
   }

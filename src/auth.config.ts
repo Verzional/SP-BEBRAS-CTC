@@ -1,4 +1,8 @@
 import type { NextAuthConfig } from "next-auth";
+import { ROLE_HOME_ROUTES } from "@/utils/auth";
+import { isAdminOrMaster } from "@/utils/auth";
+
+type UserRole = keyof typeof ROLE_HOME_ROUTES;
 
 export const authConfig = {
   providers: [],
@@ -8,37 +12,32 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isAuthRoute = nextUrl.pathname === "/auth/login";
-      const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-      const isMasterRoute = nextUrl.pathname.startsWith("/master");
+      const { pathname } = nextUrl;
+      const userRole = auth?.user?.role;
 
-      if (isAuthRoute) {
-        if (isLoggedIn && auth?.user?.role === "USER") {
-          return Response.redirect(new URL("/", nextUrl));
-        } else if (isLoggedIn && auth?.user?.role === "ADMIN") {
-          return Response.redirect(new URL("/admin", nextUrl));
+      const isPublicRoute = pathname === "/auth/login" || pathname === "/";
+
+      if (isPublicRoute && isLoggedIn && userRole) {
+        const homeRoute = ROLE_HOME_ROUTES[userRole as UserRole];
+        if (homeRoute) {
+          return Response.redirect(new URL(homeRoute, nextUrl));
         }
+      }
 
+      if (isPublicRoute) {
         return true;
-      }
-
-      if (isAdminRoute) {
-        if (isLoggedIn || auth?.user?.role !== "ADMIN") {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      if (isMasterRoute) {
-        if (isLoggedIn && auth?.user?.role === "MASTER") {
-          return true;
-        }
-        return false;
       }
 
       if (!isLoggedIn) {
         return false;
+      }
+
+      if (pathname.startsWith("/master")) {
+        return userRole === "MASTER";
+      }
+
+      if (pathname.startsWith("/admin")) {
+        return isAdminOrMaster(userRole);
       }
 
       return true;
