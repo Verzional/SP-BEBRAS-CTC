@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { getQuestionForTeam } from "@/services/question";
@@ -26,8 +25,6 @@ export interface IDetectedBarcode {
 
 
 export function QRScanner() {
-  const router = useRouter();
-
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,8 +39,6 @@ export function QRScanner() {
       if (response.error) {
         setError(response.error);
         setLoading(false);
-      } else if (response.questionId) {
-        router.push(`/question/${response.questionId}`);
       }
     }
   };
