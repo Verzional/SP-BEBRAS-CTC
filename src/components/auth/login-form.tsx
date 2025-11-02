@@ -20,6 +20,7 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,12 +43,12 @@ export function LoginForm({
         console.error("Login Error:", result.error);
         setLoading(false);
       } else if (result?.ok) {
-        // Don't set loading to false - let the navigation happen
-        // Force navigation to home, middleware will redirect to appropriate page
+        setRedirecting(true);
         window.location.href = "/";
       } else {
         setError("An unknown error occurred during login.");
         setLoading(false);
+        setRedirecting(false);
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -98,8 +99,12 @@ export function LoginForm({
                 </Field>
               )}
               <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+                <Button type="submit" disabled={loading || redirecting}>
+                  {loading
+                    ? "Logging in..."
+                    : redirecting
+                    ? "Redirecting..."
+                    : "Login"}
                 </Button>
               </Field>
             </FieldGroup>

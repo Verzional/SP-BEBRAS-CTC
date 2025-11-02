@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/layout/sidebar/app-sidebar";
-import { Breadcrumb } from "@/components/layout/sidebar/breadcrumb";
+import { AppSidebar } from "./app-sidebar";
+import { Breadcrumb } from "./breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,

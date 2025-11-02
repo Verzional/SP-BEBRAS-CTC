@@ -1,18 +1,18 @@
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider as Provider} from "next-themes";
 
-export function Provider({
+export function ThemeProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <ThemeProvider
+    <Provider
       attribute="class"
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
     >
       {children}
-    </ThemeProvider>
+    </Provider>
   );
 }
