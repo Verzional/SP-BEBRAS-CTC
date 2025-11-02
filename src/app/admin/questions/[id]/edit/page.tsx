@@ -3,7 +3,7 @@ import { getQuestionById } from "@/services/question";
 import { IDParams } from "@/types/id";
 import { QuestionEditForm } from "@/components/admin/questions/edit-form";
 
-export default async function QuestionEditPage({ params }: IDParams) {
+export default async function EditQuestionPage({ params }: IDParams) {
   const { id } = await params;
   const question = await getQuestionById(id);
 

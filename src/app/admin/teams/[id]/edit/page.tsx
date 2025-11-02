@@ -4,7 +4,7 @@ import { getAllSchools } from "@/services/school";
 import { IDParams } from "@/types/id";
 import { TeamEditForm } from "@/components/admin/teams/edit-form";
 
-export default async function TeamEditPage({ params }: IDParams) {
+export default async function EditTeamPage({ params }: IDParams) {
   const { id } = await params;
   const team = await getTeamById(id);
   const schools = await getAllSchools();

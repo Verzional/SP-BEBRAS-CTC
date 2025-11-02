@@ -85,8 +85,10 @@ model Post {
   id          String  @id @default(cuid())
   postNumber  String
   picName     String
-  description String?
   level       Level
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   teams Team[]
 }

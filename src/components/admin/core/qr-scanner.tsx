@@ -4,7 +4,26 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { getQuestionForTeam } from "@/services/question";
-import { IDetectedBarcode } from "@/types/qr";
+
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+interface IBoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface IDetectedBarcode {
+  boundingBox: IBoundingBox;
+  cornerPoints: IPoint[];
+  format: string;
+  rawValue: string;
+}
+
 
 export function QRScanner() {
   const router = useRouter();
