@@ -104,7 +104,6 @@ model Question {
   id          String     @id @default(cuid())
   title       String
   description String
-  code        Int        @unique @default(autoincrement())
   difficulty  Difficulty
 
   createdAt DateTime @default(now())

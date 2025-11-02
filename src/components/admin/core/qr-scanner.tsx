@@ -23,7 +23,6 @@ export interface IDetectedBarcode {
   rawValue: string;
 }
 
-
 export function QRScanner() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,8 +37,9 @@ export function QRScanner() {
 
       if (response.error) {
         setError(response.error);
-        setLoading(false);
       }
+
+      setLoading(false);
     }
   };
 
@@ -71,9 +71,7 @@ export function QRScanner() {
         <p className="text-center mt-4 font-medium">Loading question...</p>
       )}
       {error && (
-        <p className="text-center mt-4 text-destructive font-medium">
-          Error: {error}
-        </p>
+        <p className="text-center mt-4 text-destructive font-medium">{error}</p>
       )}
     </>
   );

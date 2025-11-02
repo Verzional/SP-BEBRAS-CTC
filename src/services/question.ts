@@ -200,3 +200,19 @@ export async function checkTeamSubmission(
     return { error: "An unexpected server error occurred." };
   }
 }
+
+export async function hasTeamAnswered(teamId: string, questionId: string) {
+  try {
+    const submission = await prisma.submission.findFirst({
+      where: {
+        teamId: teamId,
+        questionId: questionId,
+      },
+    });
+
+    return { hasAnswered: !!submission };
+  } catch (err) {
+    console.error("Error checking if team has answered: ", err);
+    return { error: "An unexpected server error occurred." };
+  }
+}
