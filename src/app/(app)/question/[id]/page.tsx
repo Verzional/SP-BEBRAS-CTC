@@ -1,27 +1,22 @@
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { getQuestionById } from "@/services/question";
+import { IDParams } from "@/types/id";
+import { Question } from "@/components/app/question";
 
-export default async function QuestionPage({
-  params,
-}: {
-  params: { code: string };
-}) {
-  const question = await getQuestionById(params.code);
+export default async function QuestionPage({ params }: IDParams) {
+  const session = await auth();
+  const { id } = await params;
 
-  if (!question) {
-    return <h1>Question not found.</h1>;
+  if (!session?.user?.teamId) {
+    redirect("/dashboard");
   }
 
-  return (
-    <div>
-      <h2>
-        {question.title} ({question.difficulty})
-      </h2>
-      <p>{question.description}</p>
-      <ul>
-        {question.answers.map((answer) => (
-          <li key={answer.id}>{answer.content}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  const question = await getQuestionById(id);
+
+  if (!question) {
+    return <div>Question not found</div>;
+  }
+
+  return <Question question={question} teamId={session.user.teamId} />;
 }

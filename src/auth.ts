@@ -20,34 +20,44 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         if (!credentials?.username || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
+
         const account = await prisma.account.findUnique({
           where: { username: credentials.username as string },
         });
+
         if (!account) {
           throw new Error("Account not found");
         }
+
         if (!account.password) {
           throw new Error("No password set for this account");
         }
+
         const isPasswordValid = verifySync(
           credentials.password as string,
           account.password
         );
+
         if (!isPasswordValid) {
           throw new Error("Invalid credentials");
         }
+
         const sessionToken = createId();
+
         const updatedAccount = await prisma.account.update({
           where: { id: account.id },
           data: { sessionToken: sessionToken },
         });
+
         if (!updatedAccount) {
           throw new Error("Failed to update account session");
         }
         return {
           id: updatedAccount.id,
           username: updatedAccount.username,
+          name: updatedAccount.name,
           role: updatedAccount.role,
+          teamId: updatedAccount.teamId,
           activeSessionToken: updatedAccount.sessionToken,
         };
       },
@@ -79,6 +89,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.id = user.id;
         token.username = user.username;
         token.role = user.role;
+        token.teamId = user.teamId;
         token.activeSessionToken = user.activeSessionToken;
         token.sessionCreatedAt = Date.now();
       } else {
@@ -110,6 +121,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         session.user.username = token.username as string;
         session.user.role = token.role!;
+        session.user.teamId = token.teamId as string | null;
       }
       return session;
     },

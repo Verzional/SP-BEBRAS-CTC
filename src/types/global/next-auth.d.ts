@@ -9,6 +9,7 @@ declare module "next-auth" {
       username: string;
       name: string;
       role: Role;
+      teamId?: string | null;
     };
   }
 
@@ -16,6 +17,7 @@ declare module "next-auth" {
     username: string;
     name: string;
     role: Role;
+    teamId?: string | null;
     activeSessionToken?: string | null;
   }
 }
@@ -26,6 +28,7 @@ declare module "next-auth/jwt" {
     username?: string;
     name?: string;
     role?: Role;
+    teamId?: string | null;
     activeSessionToken?: string | null;
     sessionCreatedAt?: number;
   }
