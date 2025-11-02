@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { MemberSchema } from "@/types/db";
+import { MemberSchema } from "@/types/db/member";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 

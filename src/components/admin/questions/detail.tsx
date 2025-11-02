@@ -7,7 +7,7 @@ import { Pencil, Trash } from "lucide-react";
 
 import { deleteQuestion } from "@/services/question";
 import { difficultyColors, difficultyLabels } from "@/utils/difficulty";
-import { FullQuestion } from "@/types/db";
+import { FullQuestion } from "@/types/db/question";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

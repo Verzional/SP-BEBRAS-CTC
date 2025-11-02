@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { FullQuestion } from "@/types/db";
+import { FullQuestion } from "@/types/db/question";
 
 import { Badge } from "@/components/ui/badge";
 import {

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { SchoolSchema } from "@/types/db";
+import { SchoolSchema } from "@/types/db/school";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 

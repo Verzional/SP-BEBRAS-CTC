@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import { createAnswer } from "@/services/answer";
 import { saveImageMetadata, deleteImage } from "@/services/image";
-import { AnswerSchema } from "@/types/db";
+import { AnswerSchema } from "@/types/db/answer";
 import { Question } from "@/generated/client/client";
 
 import { UploadWidget } from "@/components/layout/upload-widget";

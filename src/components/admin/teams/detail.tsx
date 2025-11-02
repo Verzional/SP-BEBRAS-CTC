@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteTeam } from "@/services/team";
-import { FullTeam } from "@/types/db";
+import { FullTeam } from "@/types/db/team";
 
 import { Button } from "@/components/ui/button";
 import {

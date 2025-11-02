@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "../lib/prisma";
-import { AnswerSchema } from "@/types/db";
+import { AnswerSchema } from "@/types/db/answer";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 

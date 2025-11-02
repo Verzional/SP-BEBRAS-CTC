@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { updateQuestion } from "@/services/question";
 import { saveImageMetadata, deleteImage } from "@/services/image";
-import { QuestionSchema } from "@/types/db";
+import { QuestionSchema } from "@/types/db/question";
 import { Question, Image as ImageType } from "@/generated/client/client";
 
 import { UploadWidget } from "@/components/layout/upload-widget";

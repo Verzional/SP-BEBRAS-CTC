@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
 import { updateTeam } from "@/services/team";
-import { TeamSchema } from "@/types/db";
+import { TeamSchema } from "@/types/db/team";
 import { Team, School } from "@/generated/client/client";
 
 import { Button } from "@/components/ui/button";

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { FullMember } from "@/types/db";
+import { FullMember } from "@/types/db/member";
 
 import {
   Table,

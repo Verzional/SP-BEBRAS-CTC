@@ -3,27 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Scanner } from "@yudiel/react-qr-scanner";
-
 import { getQuestionForTeam } from "@/services/question";
-
-interface IPoint {
-  x: number;
-  y: number;
-}
-
-interface IBoundingBox {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-interface IDetectedBarcode {
-  boundingBox: IBoundingBox;
-  cornerPoints: IPoint[];
-  format: string;
-  rawValue: string;
-}
+import { IDetectedBarcode } from "@/types/qr";
 
 export function QRScanner() {
   const router = useRouter();

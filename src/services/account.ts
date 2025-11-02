@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { hashSync } from "@node-rs/bcrypt";
-import { AccountFormData, AccountSchema } from "@/types/db";
+import { AccountFormData, AccountSchema } from "@/types/db/account";
 
 export async function getAllAccounts() {
   return await prisma.account.findMany({

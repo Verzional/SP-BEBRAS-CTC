@@ -1,10 +1,12 @@
 "use client";
 
-import { Team } from "@/generated/client/client";
 import { QRCodeSVG } from "qrcode.react";
 
 interface QRCodeProps {
-  team: Team;
+  team: {
+    id: string;
+    name: string;
+  };
   size?: number;
 }
 

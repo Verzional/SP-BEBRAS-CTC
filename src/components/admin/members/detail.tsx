@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteMember } from "@/services/member";
-import { FullMember } from "@/types/db";
+import { FullMember } from "@/types/db/member";
 
 import { Button } from "@/components/ui/button";
 import {

@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { updateSchool } from "@/services/school";
-import { SchoolSchema } from "@/types/db";
+import { SchoolSchema } from "@/types/db/school";
 import { School } from "@/generated/client/client";
 
 import { Button } from "@/components/ui/button";

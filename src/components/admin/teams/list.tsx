@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FullTeam } from "@/types/db";
+import { FullTeam } from "@/types/db/team";
 import { QRCode } from "@/components/admin/core/qr-code";
 
 interface TeamListProps {

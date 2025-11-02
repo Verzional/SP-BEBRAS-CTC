@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { TeamSchema } from "@/types/db";
+import { TeamSchema } from "@/types/db/team";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -12,6 +12,7 @@ export async function getAllTeams() {
     },
     include: {
       school: true,
+      members: true,
     },
   });
 }
