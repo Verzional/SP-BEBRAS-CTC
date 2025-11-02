@@ -2,9 +2,9 @@
 
 import { signOut } from "next-auth/react";
 import { QRCode } from "@/components/admin/core/qr-code";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Team {
   id: string;
@@ -85,7 +85,9 @@ export function Dashboard({ team }: DashboardProps) {
           <ol className="list-decimal list-inside space-y-2 text-sm">
             <li>Show your QR code to the admin when prompted</li>
             <li>Answer the questions that appear</li>
-            <li>Earn points for correct answers, lose points for incorrect ones</li>
+            <li>
+              Earn points for correct answers, lose points for incorrect ones
+            </li>
             <li>Check your score here on the dashboard</li>
           </ol>
         </CardContent>

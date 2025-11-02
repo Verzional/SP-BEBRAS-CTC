@@ -35,20 +35,20 @@ const schools = [
 const teams = [
   { name: "Cyber Warriors" },
   { name: "Code Crusaders" },
-  { name: "Digital Dynamos" },
   { name: "AI Avengers" },
+  { name: "Digital Dynamos" },
   { name: "Quantum Questers" },
 ];
 
 const userAccounts = [
   { name: "Cyber Warriors", username: "cyberwarrior", password: "password123" },
   { name: "Code Crusaders", username: "codecrusader", password: "password123" },
+  { name: "AI Avengers", username: "aiavenger", password: "password123" },
   {
     name: "Digital Dynamos",
     username: "digitaldynamo",
     password: "password123",
   },
-  { name: "AI Avengers", username: "aiavenger", password: "password123" },
   {
     name: "Quantum Questers",
     username: "quantumquester",
