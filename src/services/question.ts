@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { pusherServer } from "@/lib/pusher";
 import { QuestionSchema } from "@/types/db/question";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -128,6 +129,10 @@ export async function getQuestionForTeam(teamId: string) {
     if (!question) {
       return { error: "This team has already solved all available questions!" };
     }
+
+    await pusherServer.trigger(`team-${teamId}`, "question-assigned", {
+      questionId: question.id,
+    });
 
     return { questionId: question.id };
   } catch (err) {

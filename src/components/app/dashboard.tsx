@@ -1,6 +1,9 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { pusherClient } from "@/lib/pusher";
 import { QRCode } from "@/components/admin/core/qr-code";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +28,20 @@ interface DashboardProps {
 }
 
 export function Dashboard({ team }: DashboardProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe(`team-${team.id}`);
+
+    channel.bind("question-assigned", (data: { questionId: string }) => {
+      router.push(`/question/${data.questionId}`);
+    });
+
+    return () => {
+      pusherClient.unsubscribe(`team-${team.id}`);
+    };
+  }, [team.id, router]);
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
