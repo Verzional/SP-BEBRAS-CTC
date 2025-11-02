@@ -1,3 +1,5 @@
+import { PostCreateForm } from "@/components/admin/posts/create-form";
+
 export default function CreatePostPage() {
-    return <div>This page is under construction</div>;
+  return <PostCreateForm />;
 }

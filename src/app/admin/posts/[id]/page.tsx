@@ -1,3 +1,15 @@
-export default function PostDetailPage() {
-    return <div>This page is under construction</div>;
+import { notFound } from "next/navigation";
+import { getPostById } from "@/services/post";
+import { IDParams } from "@/types/id";
+import { PostDetail } from "@/components/admin/posts/detail";
+
+export default async function PostDetailPage({ params }: IDParams) {
+  const { id } = await params;
+  const post = await getPostById(id);
+
+  if (!post) {
+    notFound();
+  }
+
+  return <PostDetail post={post} />;
 }

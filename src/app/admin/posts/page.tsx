@@ -1,3 +1,8 @@
-export default function PostsPage() {
-    return <div>This page is under construction</div>;
+import { getAllPosts } from "@/services/post";
+import { PostList } from "@/components/admin/posts/list";
+
+export default async function PostsPage() {
+  const posts = await getAllPosts();
+
+  return <PostList posts={posts} />;
 }
