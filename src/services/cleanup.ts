@@ -7,6 +7,7 @@ cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  timeout: 60000, // 60 seconds timeout
 });
 
 interface CloudinaryResource {
@@ -33,6 +34,7 @@ export async function cleanupOrphanedImages(
       type: "upload",
       prefix: folder,
       max_results: 500,
+      timeout: 60000,
     });
 
     const dbImages = await prisma.image.findMany({
@@ -45,17 +47,28 @@ export async function cleanupOrphanedImages(
       (resource: CloudinaryResource) => !dbPublicIds.has(resource.public_id)
     );
 
-    for (const orphan of orphanedImages) {
-      try {
-        await cloudinary.uploader.destroy(orphan.public_id);
-        deletedCount++;
-        console.log(`Deleted orphaned image: ${orphan.public_id}`);
-      } catch (error) {
-        const errorMsg = `Failed to delete ${orphan.public_id}: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`;
-        errors.push(errorMsg);
-        console.error(errorMsg);
+    const batchSize = 10;
+    for (let i = 0; i < orphanedImages.length; i += batchSize) {
+      const batch = orphanedImages.slice(i, i + batchSize);
+
+      await Promise.all(
+        batch.map(async (orphan: CloudinaryResource) => {
+          try {
+            await cloudinary.uploader.destroy(orphan.public_id);
+            deletedCount++;
+            console.log(`Deleted orphaned image: ${orphan.public_id}`);
+          } catch (error) {
+            const errorMsg = `Failed to delete ${orphan.public_id}: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`;
+            errors.push(errorMsg);
+            console.error(errorMsg);
+          }
+        })
+      );
+
+      if (i + batchSize < orphanedImages.length) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
@@ -66,12 +79,24 @@ export async function cleanupOrphanedImages(
     };
   } catch (error) {
     console.error("Cleanup failed:", error);
+
+    let errorMessage = "Unknown cleanup error";
+    if (error instanceof Error) {
+      if (error.message.includes("ETIMEDOUT")) {
+        errorMessage =
+          "Request timed out during cleanup. Please check your internet connection and try again.";
+      } else if (error.message.includes("ENOTFOUND")) {
+        errorMessage =
+          "Network error during cleanup. Please check your internet connection.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
     return {
       success: false,
       deletedCount,
-      errors: [
-        error instanceof Error ? error.message : "Unknown cleanup error",
-      ],
+      errors: [errorMessage],
     };
   }
 }
@@ -100,6 +125,7 @@ export async function getOrphanedImages(folder: string) {
       type: "upload",
       prefix: folder,
       max_results: 500,
+      timeout: 60000,
     });
 
     const dbImages = await prisma.image.findMany({
@@ -123,9 +149,22 @@ export async function getOrphanedImages(folder: string) {
     };
   } catch (error) {
     console.error("Failed to get orphaned images:", error);
+
+    let errorMessage = "Unknown error";
+    if (error instanceof Error) {
+      if (error.message.includes("ETIMEDOUT")) {
+        errorMessage =
+          "Request timed out. Please check your internet connection and try again.";
+      } else if (error.message.includes("ENOTFOUND")) {
+        errorMessage = "Network error. Please check your internet connection.";
+      } else {
+        errorMessage = error.message;
+      }
+    }
+
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     };
   }
 }

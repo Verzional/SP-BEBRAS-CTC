@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { getQuestionById, hasTeamAnswered } from "@/services/question";
 import { IDParams } from "@/types/id";
 import { Question } from "@/components/app/question";
+import { ContestGuard } from "@/components/layout/contest-guard";
 
 export default async function QuestionPage({ params }: IDParams) {
   const session = await auth();
@@ -37,5 +38,10 @@ export default async function QuestionPage({ params }: IDParams) {
     );
   }
 
-  return <Question question={question} teamId={session.user.teamId} />;
+  return (
+    <>
+      <ContestGuard />
+      <Question question={question} teamId={session.user.teamId} />
+    </>
+  );
 }

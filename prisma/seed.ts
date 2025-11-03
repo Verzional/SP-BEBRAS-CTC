@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import { Role, Difficulty } from "@/generated/client/enums";
 import { hashSync } from "@node-rs/bcrypt";
+import { Role, Difficulty, ContestStatus } from "@/generated/client/enums";
 
 const adminAccounts = [
   {
@@ -320,6 +320,21 @@ export async function main() {
       await seedAnswer(answer, createdQuestions[i].id);
     }
   }
+
+  // Seed Contest
+  console.log("\n" + "=".repeat(50));
+  console.log("Seeding contest...");
+  console.log("=".repeat(50));
+
+  const contest = await prisma.contest.create({
+    data: {
+      name: "1st Bebras CTC",
+      startTime: new Date(),
+      endTime: new Date(),
+      status: ContestStatus.PENDING,
+    },
+  });
+  console.log(`Created contest: ${contest.name}`);
 
   console.log("\n" + "=".repeat(50));
   console.log("Seeding completed!");

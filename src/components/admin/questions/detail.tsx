@@ -59,12 +59,6 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
             <dl className="divide-y">
               <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
                 <dt className="text-muted-foreground text-sm font-medium">
-                  Code
-                </dt>
-                <dd className="text-sm font-mono">#{question.code}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
                   Title
                 </dt>
                 <dd className="text-sm">{question.title}</dd>
@@ -138,9 +132,16 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-background">{answer.content}</p>
+                        <p className="text-sm text-background">
+                          {answer.content}
+                        </p>
                       </div>
-                      <Button variant="ghost" size="icon-sm" className="bg-background" asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="bg-background"
+                        asChild
+                      >
                         <Link href={`/admin/answers/${answer.id}/edit`}>
                           <Pencil className="h-4 w-4" />
                         </Link>

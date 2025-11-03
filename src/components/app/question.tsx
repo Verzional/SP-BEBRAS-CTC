@@ -19,7 +19,6 @@ interface QuestionProps {
     id: string;
     title: string;
     description: string;
-    code: number;
     difficulty: "EASY" | "MEDIUM" | "HARD";
     answers: {
       id: string;

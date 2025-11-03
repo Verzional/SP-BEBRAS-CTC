@@ -40,7 +40,6 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
       {/* Table Header */}
       <TableHeader>
         <TableRow>
-          <TableHead>Code</TableHead>
           <TableHead>Title</TableHead>
           <TableHead>Difficulty</TableHead>
           <TableHead>Images</TableHead>
@@ -55,7 +54,6 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
             onClick={() => router.push(`/admin/questions/${question.id}`)}
             className="cursor-pointer"
           >
-            <TableCell className="font-medium">#{question.code}</TableCell>
             <TableCell className="max-w-md truncate">
               {question.title}
             </TableCell>
