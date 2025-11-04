@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { CheckCircle, XCircle } from "lucide-react";
 import { checkTeamSubmission } from "@/services/question";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,8 +13,12 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface QuestionProps {
   question: {
@@ -42,6 +48,7 @@ interface QuestionProps {
 export function Question({ question, teamId }: QuestionProps) {
   const router = useRouter();
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{
     success?: boolean;
@@ -137,7 +144,7 @@ export function Question({ question, teamId }: QuestionProps) {
               {question.difficulty}
             </span>
           </CardTitle>
-          <CardDescription className="text-white whitespace-pre-wrap">
+          <CardDescription className="text-foreground">
             {question.description}
           </CardDescription>
         </CardHeader>
@@ -145,7 +152,11 @@ export function Question({ question, teamId }: QuestionProps) {
           {question.images.length > 0 && (
             <div className="space-y-2">
               {question.images.map((image) => (
-                <div key={image.id} className="relative w-full h-64">
+                <div
+                  key={image.id}
+                  className="relative w-full h-64 cursor-pointer"
+                  onClick={() => setZoomedImage(image.url)}
+                >
                   <Image
                     src={image.url}
                     alt="Question image"
@@ -176,7 +187,8 @@ export function Question({ question, teamId }: QuestionProps) {
                     {answer.images.map((image) => (
                       <div
                         key={image.id}
-                        className="relative w-full h-32 border rounded-lg overflow-hidden"
+                        className="relative w-full h-32 border rounded-lg overflow-hidden cursor-pointer"
+                        onClick={() => setZoomedImage(image.url)}
                       >
                         <Image
                           src={image.url}
@@ -201,6 +213,27 @@ export function Question({ question, teamId }: QuestionProps) {
           </Button>
         </CardContent>
       </Card>
+
+      <Dialog
+        open={!!zoomedImage}
+        onOpenChange={(open) => !open && setZoomedImage(null)}
+      >
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>{question.title}</DialogTitle>
+          </DialogHeader>
+          {zoomedImage && (
+            <div className="relative w-full h-[80vh]">
+              <Image
+                src={zoomedImage}
+                alt="Zoomed image"
+                fill
+                className="object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
