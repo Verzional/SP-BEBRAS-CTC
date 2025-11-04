@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingIncludes: {
+    "/*": [
+      "./src/generated/client/libquery_engine-debian-openssl-3.0.x.so.node",
+    ],
+  },
   reactCompiler: true,
 };
 
