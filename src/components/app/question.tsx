@@ -182,7 +182,7 @@ export function Question({ question, teamId }: QuestionProps) {
                           src={image.url}
                           alt={`Answer image ${image.id}`}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       </div>
                     ))}
