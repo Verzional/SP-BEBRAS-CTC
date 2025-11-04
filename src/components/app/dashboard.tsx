@@ -36,6 +36,7 @@ interface DashboardProps {
 export function Dashboard({ team }: DashboardProps) {
   const router = useRouter();
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
+  const [qrSize] = useState(() => Math.min(250, window.innerWidth * 0.6));
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`team-${team.id}`);
@@ -52,7 +53,9 @@ export function Dashboard({ team }: DashboardProps) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-end">
-        <h1 className="text-3xl font-bold">Team Dashboard</h1>
+        <h1 className="text-3xl font-bold">
+          Team <br /> Dashboard
+        </h1>
         <Button onClick={() => signOut()} variant="outline">
           Sign Out
         </Button>
@@ -127,13 +130,13 @@ export function Dashboard({ team }: DashboardProps) {
         open={isQRDialogOpen}
         onOpenChange={(open) => !open && setIsQRDialogOpen(false)}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[90vw] max-w-2xl">
           <DialogHeader>
             <DialogTitle>{team.name} - QR Code</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center space-y-4 p-6">
-            <QRCode team={team} size={400} />
-            <p className="text-sm text-muted-foreground text-center">
+            <QRCode team={team} size={qrSize} />
+            <p className="text-xs sm:text-sm text-muted-foreground text-center">
               Show this QR code to the admin to receive questions
             </p>
           </div>
