@@ -52,15 +52,16 @@ jobs:
       - name: Package Deployment Files
         run: zip -r deploy.zip .next public package.json pnpm-lock.yaml pnpm-workspace.yaml prisma
 
-      - name: Copy Files to VPS
-        uses: appleboy/scp-action@v1
+      - name: Sync Files to VPS (using rsync)
+        uses: burnett01/rsync-deployments@6.0.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_DEPLOY_KEY }}
-          port: ${{ vars.VPS_PORT }}
-          source: "deploy.zip"
-          target: ${{ vars.PROJECT_PATH }}
+          switches: -avz 
+          path: deploy.zip 
+          remote_path: ${{ vars.PROJECT_PATH }}
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USERNAME }}
+          remote_key: ${{ secrets.VPS_DEPLOY_KEY }}
+          remote_port: ${{ vars.VPS_PORT }}
 
       - name: Deploy on VPS
         uses: appleboy/ssh-action@v1
