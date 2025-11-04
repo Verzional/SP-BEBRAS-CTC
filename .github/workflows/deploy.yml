@@ -52,7 +52,7 @@ jobs:
       - name: Sync Files to VPS
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude '.git*' --exclude 'node_modules' --exclude '.github' --exclude 'src' --exclude '*.env'
+          switches: -avzr --delete --exclude '.git*' --exclude 'node_modules' --exclude '.github' --exclude '*.env'
           path: .
           remote_path: ${{ vars.PROJECT_PATH }}
           remote_host: ${{ secrets.VPS_HOST }}
