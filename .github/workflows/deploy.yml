@@ -9,6 +9,14 @@ jobs:
   build-and-deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_PUSHER_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_KEY }}
+          NEXT_PUBLIC_PUSHER_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}
+          NEXT_PUBLIC_SOKETI_HOST: ${{ secrets.NEXT_PUBLIC_SOKETI_HOST }}
+          NEXT_PUBLIC_SOKETI_PORT: ${{ secrets.NEXT_PUBLIC_SOKETI_PORT }}
+          NEXT_PUBLIC_SOKETI_TLS: ${{ secrets.NEXT_PUBLIC_SOKETI_TLS }}
+          NEXT_PUBLIC_SOKETI_PATH: ${{ secrets.NEXT_PUBLIC_SOKETI_PATH }}
 
     steps:
       - name: Repository Checkout
@@ -38,14 +46,6 @@ jobs:
 
       - name: Build Project
         run: pnpm build
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NEXT_PUBLIC_PUSHER_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_KEY }}
-          NEXT_PUBLIC_PUSHER_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}
-          NEXT_PUBLIC_SOKETI_HOST: ${{ secrets.NEXT_PUBLIC_SOKETI_HOST }}
-          NEXT_PUBLIC_SOKETI_PORT: ${{ secrets.NEXT_PUBLIC_SOKETI_PORT }}
-          NEXT_PUBLIC_SOKETI_TLS: ${{ secrets.NEXT_PUBLIC_SOKETI_TLS }}
-          NEXT_PUBLIC_SOKETI_PATH: ${{ secrets.NEXT_PUBLIC_SOKETI_PATH }}
 
       - name: Package Deployment Files
         run: zip -r deploy.zip .next public package.json pnpm-lock.yaml pnpm-workspace.yaml prisma
