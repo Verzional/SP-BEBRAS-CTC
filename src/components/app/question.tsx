@@ -137,7 +137,7 @@ export function Question({ question, teamId }: QuestionProps) {
               {question.difficulty}
             </span>
           </CardTitle>
-          <CardDescription className="text-white">
+          <CardDescription className="text-white whitespace-pre-wrap">
             {question.description}
           </CardDescription>
         </CardHeader>
