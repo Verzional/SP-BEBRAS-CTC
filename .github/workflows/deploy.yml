@@ -52,7 +52,7 @@ jobs:
       - name: Sync Files to VPS
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avzr --delete --exclude '.git*' --exclude 'node_modules' --exclude '.github' --exclude '*.env'
+          switches: -avzr --delete --exclude '.git*' --exclude 'node_modules' --exclude '.github' --exclude '*.env' --exclude '*.pem' --exclude 'src/generated/client'
           path: .
           remote_path: ${{ vars.PROJECT_PATH }}
           remote_host: ${{ secrets.VPS_HOST }}
@@ -77,12 +77,6 @@ jobs:
 
             echo "🧹 Installing --prod dependencies..."
             pnpm install --prod
-
-            echo "🧠 Generating Prisma client for prod server..."
-            pnpm prisma generate
-
-            echo "🔐 Applying AGGRESSIVE permissions..."
-            find ./src/generated/client -name "*.so.node" -exec chmod 755 {} \;
 
             echo "🗄️ Running database migrations..."
             pnpm prisma:deploy
