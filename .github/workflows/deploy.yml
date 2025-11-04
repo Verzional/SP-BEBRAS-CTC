@@ -76,13 +76,13 @@ jobs:
             cd ${{ vars.PROJECT_PATH }}
 
             echo "🧹 Installing --prod dependencies..."
-            pnpm install --prod --ignore-scripts
+            pnpm install --prod
 
             echo "🧠 Generating Prisma client for prod server..."
             pnpm prisma generate
 
-            echo "🔐 Applying execute permissions to Prisma engine..."
-            chmod +x ./src/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+            echo "🔐 Applying AGGRESSIVE permissions..."
+            find ./src/generated/client -name "*.so.node" -exec chmod 755 {} \;
 
             echo "🗄️ Running database migrations..."
             pnpm prisma:deploy
