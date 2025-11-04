@@ -49,14 +49,11 @@ jobs:
       - name: Build Project
         run: pnpm build
 
-      - name: Package Deployment Files
-        run: zip -r deploy.zip .next public package.json pnpm-lock.yaml pnpm-workspace.yaml prisma
-
-      - name: Sync Files to VPS (using rsync)
+      - name: Sync Files to VPS 
         uses: burnett01/rsync-deployments@6.0.0
         with:
-          switches: -avz 
-          path: deploy.zip 
+          switches: -avzr --delete --exclude '.git*' --exclude 'node_modules' --exclude '.github' --exclude 'src'
+          path: .
           remote_path: ${{ vars.PROJECT_PATH }}
           remote_host: ${{ secrets.VPS_HOST }}
           remote_user: ${{ secrets.VPS_USERNAME }}
@@ -78,9 +75,6 @@ jobs:
             echo "📁 Navigating to project directory..."
             cd ${{ vars.PROJECT_PATH }}
 
-            echo "📦 Unzipping new version..."
-            unzip -o deploy.zip
-
             echo "🧹 Installing --prod dependencies..."
             pnpm install --prod --ignore-scripts
 
@@ -89,8 +83,5 @@ jobs:
 
             echo "🔄 Reloading application..."
             pm2 restart ${{ vars.PM2_APP_NAME }}
-
-            echo "🗑️ Cleaning up..."
-            rm deploy.zip
 
             echo "✅ Deployment finished."
