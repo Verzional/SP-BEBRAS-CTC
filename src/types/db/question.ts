@@ -17,7 +17,11 @@ export type Question = z.infer<typeof QuestionSchema>;
 // INCLUDE //
 export const questionInclude = {
   images: true,
-  answers: true,
+  answers: {
+    include: {
+      images: true,
+    },
+  },
 } satisfies Prisma.QuestionInclude;
 
 export type FullQuestion = Prisma.QuestionGetPayload<{

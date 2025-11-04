@@ -133,9 +133,26 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                           )}
                         </div>
                         <p className="text-sm text-background">
-                          {answer.content}
+                          {answer.content} 
                         </p>
                       </div>
+                      {answer.images && answer.images.length > 0 && (
+                        <div className="flex gap-2">
+                          {answer.images.map((image) => (
+                            <div
+                              key={image.id}
+                              className="relative w-16 h-16 border rounded-lg overflow-hidden"
+                            >
+                              <Image
+                                src={image.url}
+                                alt={`Answer image ${image.id}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon-sm"

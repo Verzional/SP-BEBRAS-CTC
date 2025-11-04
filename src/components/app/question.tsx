@@ -24,6 +24,11 @@ interface QuestionProps {
       id: string;
       content: string;
       correct: boolean;
+      images?: {
+        id: string;
+        url: string;
+        publicId: string;
+      }[];
     }[];
     images: {
       id: string;
@@ -166,7 +171,24 @@ export function Question({ question, teamId }: QuestionProps) {
                   onChange={(e) => setSelectedAnswerId(e.target.value)}
                   className="w-4 h-4"
                 />
-                <span>{answer.content}</span>
+                <span className="flex-1">{answer.content}</span>
+                {answer.images && answer.images.length > 0 && (
+                  <div className="flex gap-2">
+                    {answer.images.map((image) => (
+                      <div
+                        key={image.id}
+                        className="relative w-16 h-16 border rounded-lg overflow-hidden"
+                      >
+                        <Image
+                          src={image.url}
+                          alt={`Answer image ${image.id}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </label>
             ))}
           </div>

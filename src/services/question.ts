@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
-import { QuestionSchema } from "@/types/db/question";
+import { QuestionSchema, questionInclude } from "@/types/db/question";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -11,20 +11,14 @@ export async function getAllQuestions() {
     orderBy: {
       createdAt: "desc",
     },
-    include: {
-      images: true,
-      answers: true,
-    },
+    include: questionInclude,
   });
 }
 
 export async function getQuestionById(questionId: string) {
   return await prisma.question.findUnique({
     where: { id: questionId },
-    include: {
-      images: true,
-      answers: true,
-    },
+    include: questionInclude,
   });
 }
 
