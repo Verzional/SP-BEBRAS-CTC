@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 export function QuestionCreateForm() {
   const [isPending, startTransition] = useTransition();
@@ -156,7 +157,7 @@ export function QuestionCreateForm() {
                   <FieldLabel htmlFor="form-question-description">
                     Question Description
                   </FieldLabel>
-                  <Input
+                  <Textarea
                     {...field}
                     value={field.value}
                     id="form-question-description"
@@ -164,6 +165,7 @@ export function QuestionCreateForm() {
                     placeholder="Enter question description"
                     autoComplete="off"
                     disabled={isPending}
+                    rows={6}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
