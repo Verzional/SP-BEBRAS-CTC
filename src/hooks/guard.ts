@@ -49,7 +49,7 @@ export function useContestGuard() {
   }, [mutate]);
 
   useEffect(() => {
-    if (!session || !contestStatus || session.user?.role === Role.ADMIN || pathname === "/") {
+    if (!session || !contestStatus || session.user?.role === Role.ADMIN || session.user?.role === Role.MASTER || pathname === "/") {
       return;
     }
 
