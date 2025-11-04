@@ -6,6 +6,7 @@ import { pusherServer } from "@/lib/pusher";
 import { Prisma } from "@/generated/client/client";
 import { ContestStatus } from "@/generated/client/enums";
 import { revalidatePath } from "next/cache";
+import { getQuestionForTeam } from "./question";
 
 export async function getActiveContest() {
   const contest = await prisma.contest.findFirst();
@@ -20,7 +21,7 @@ export async function getActiveContest() {
 export async function startContest(formData: FormData) {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
 
@@ -55,13 +56,18 @@ export async function startContest(formData: FormData) {
     updatedContest
   );
 
+  const teams = await prisma.team.findMany({ select: { id: true } });
+  for (const team of teams) {
+    await getQuestionForTeam(team.id);
+  }
+
   revalidatePath("/admin");
 }
 
 export async function pauseContest() {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
 
@@ -96,7 +102,7 @@ export async function pauseContest() {
 export async function resumeContest() {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
 
@@ -134,7 +140,7 @@ export async function resumeContest() {
 export async function freezeContest() {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
 
@@ -183,7 +189,7 @@ export async function freezeContest() {
 export async function unfreezeContest() {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
 
@@ -213,7 +219,7 @@ export async function unfreezeContest() {
 export async function endContest() {
   const session = await auth();
 
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
     throw new Error("Unauthorized");
   }
   const contest = await getActiveContest();

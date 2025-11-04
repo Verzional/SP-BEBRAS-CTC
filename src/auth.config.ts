@@ -11,17 +11,21 @@ export const authConfig = {
   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
       const { pathname } = nextUrl;
-      const userRole = auth?.user?.role;
 
-      const isPublicRoute = pathname === "/auth/login" || pathname === "/";
+      const isLoggedIn = !!auth?.user;
+      const userRole = auth?.user?.role;
+      const isPublicRoute = pathname === "/auth/login";
 
       if (isPublicRoute && isLoggedIn && userRole) {
         const homeRoute = ROLE_HOME_ROUTES[userRole as UserRole];
         if (homeRoute) {
           return Response.redirect(new URL(homeRoute, nextUrl));
         }
+      }
+
+      if (!isLoggedIn && pathname === "/") {
+        return false;
       }
 
       if (isPublicRoute) {
