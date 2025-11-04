@@ -6,18 +6,67 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     name: Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH and Deploy
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Repository Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Cache Build Files
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('src/**/*.[jt]s', 'src/**/*.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build Project
+        run: pnpm build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_PUSHER_KEY: ${{ secrets.NEXT_PUBLIC_PUSHER_KEY }}
+          NEXT_PUBLIC_PUSHER_CLUSTER: ${{ secrets.NEXT_PUBLIC_PUSHER_CLUSTER }}
+          NEXT_PUBLIC_SOKETI_HOST: ${{ secrets.NEXT_PUBLIC_SOKETI_HOST }}
+          NEXT_PUBLIC_SOKETI_PORT: ${{ secrets.NEXT_PUBLIC_SOKETI_PORT }}
+          NEXT_PUBLIC_SOKETI_TLS: ${{ secrets.NEXT_PUBLIC_SOKETI_TLS }}
+          NEXT_PUBLIC_SOKETI_PATH: ${{ secrets.NEXT_PUBLIC_SOKETI_PATH }}
+
+      - name: Package Deployment Files
+        run: zip -r deploy.zip .next public package.json pnpm-lock.yaml pnpm-workspace.yaml prisma
+
+      - name: Copy Files to VPS
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_DEPLOY_KEY }}
-          port: ${{ vars.VPS_PORT}}
+          port: ${{ vars.VPS_PORT }}
+          source: "deploy.zip"
+          target: ${{ vars.PROJECT_PATH }}
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          port: ${{ vars.VPS_PORT }}
           script: |
             echo "🔧 Loading NVM..."
             export NVM_DIR="$HOME/.nvm"
@@ -26,19 +75,19 @@ jobs:
             echo "📁 Navigating to project directory..."
             cd ${{ vars.PROJECT_PATH }}
 
-            echo "📥 Pulling latest changes..."
-            git pull origin main
+            echo "📦 Unzipping new version..."
+            unzip -o deploy.zip
 
-            echo "📦 Installing dependencies..."
-            pnpm install
+            echo "🧹 Installing --prod dependencies..."
+            pnpm install --prod --ignore-scripts
 
             echo "🗄️ Running database migrations..."
             pnpm prisma:deploy
 
-            echo "🔨 Building new version..."
-            pnpm build
-
             echo "🔄 Reloading application..."
             pm2 reload ${{ vars.PM2_APP_NAME }}
+
+            echo "🗑️ Cleaning up..."
+            rm deploy.zip
 
             echo "✅ Deployment finished."
