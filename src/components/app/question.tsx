@@ -6,13 +6,7 @@ import { useState, useEffect } from "react";
 import { CheckCircle, XCircle } from "lucide-react";
 import { checkTeamSubmission } from "@/services/question";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,11 +18,11 @@ interface QuestionProps {
   question: {
     id: string;
     title: string;
-    description: string;
+    level: "SMP" | "SMA";
     difficulty: "EASY" | "MEDIUM" | "HARD";
     answers: {
       id: string;
-      content: string;
+      content: string | null;
       correct: boolean;
       images?: {
         id: string;
@@ -144,9 +138,6 @@ export function Question({ question, teamId }: QuestionProps) {
               {question.difficulty}
             </span>
           </CardTitle>
-          <CardDescription className="text-foreground">
-            {question.description}
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {question.images.length > 0 && (
@@ -154,14 +145,16 @@ export function Question({ question, teamId }: QuestionProps) {
               {question.images.map((image) => (
                 <div
                   key={image.id}
-                  className="relative w-full h-64 cursor-pointer"
+                  className="w-full cursor-pointer"
                   onClick={() => setZoomedImage(image.url)}
                 >
                   <Image
                     src={image.url}
                     alt="Question image"
-                    fill
-                    className="object-contain rounded"
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="w-full h-auto rounded"
                   />
                 </div>
               ))}
@@ -171,7 +164,7 @@ export function Question({ question, teamId }: QuestionProps) {
           <div className="space-y-2">
             {question.answers.map((answer) => (
               <div key={answer.id} className="cursor-pointer">
-                <label className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <input
                     type="radio"
                     name="answer"
@@ -180,26 +173,30 @@ export function Question({ question, teamId }: QuestionProps) {
                     onChange={(e) => setSelectedAnswerId(e.target.value)}
                     className="w-4 h-4"
                   />
-                  <span className="flex-1">{answer.content}</span>
-                </label>
-                {answer.images && answer.images.length > 0 && (
-                  <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {answer.images.map((image) => (
-                      <div
-                        key={image.id}
-                        className="relative w-full h-32 border rounded-lg overflow-hidden cursor-pointer"
-                        onClick={() => setZoomedImage(image.url)}
-                      >
-                        <Image
-                          src={image.url}
-                          alt={`Answer image ${image.id}`}
-                          fill
-                          className="object-contain"
-                        />
+                  <div className="flex-1">
+                    <span>{answer.content ?? ""}</span>
+                    {(answer.images ?? []).length > 0 && (
+                      <div className="space-y-2 mt-2">
+                        {(answer.images ?? []).map((image) => (
+                          <div
+                            key={image.id}
+                            className="w-full cursor-pointer"
+                            onClick={() => setZoomedImage(image.url)}
+                          >
+                            <Image
+                              src={image.url}
+                              alt="Answer image"
+                              width={0}
+                              height={0}
+                              sizes="100vw"
+                              className="w-full h-auto rounded"
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>

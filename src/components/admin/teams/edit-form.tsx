@@ -4,13 +4,13 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Controller, useForm, useFieldArray } from "react-hook-form";
+import { Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { cn } from "@/lib/utils";
-import { updateTeam } from "@/services/team";
-import { TeamSchema } from "@/types/db/team";
+import { updateTeamWithMembers } from "@/services/team";
+import { TeamWithMembersSchema } from "@/types/db/team";
 import { Team, School } from "@/generated/client/client";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -43,9 +42,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TeamEditFormProps {
-  team: Team;
+  team: Team & { members?: { id: string; name: string }[] };
   schools?: School[];
 }
 
@@ -54,46 +60,58 @@ export function TeamEditForm({ team, schools = [] }: TeamEditFormProps) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof TeamSchema>>({
-    resolver: zodResolver(TeamSchema),
+  const form = useForm<z.infer<typeof TeamWithMembersSchema>>({
+    resolver: zodResolver(TeamWithMembersSchema),
     defaultValues: {
       name: team.name,
+      level: team.level,
       schoolId: team.schoolId,
+      members: team.members?.map(member => ({ name: member.name })) || [{ name: "" }],
     },
   });
 
-  function onSubmit(data: z.infer<typeof TeamSchema>) {
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "members",
+  });
+
+  function onSubmit(data: z.infer<typeof TeamWithMembersSchema>) {
     startTransition(async () => {
-      try {
-        const payload = {
-          ...data,
-          schoolId: data.schoolId,
-        };
+      const result = await updateTeamWithMembers(team.id, data);
 
-        await updateTeam(team.id, payload);
-
-        toast.success("team updated successfully!");
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Team updated successfully!");
         router.push(`/admin/teams/${team.id}`);
         router.refresh();
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Failed to update school"
-        );
       }
     });
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Edit Team</CardTitle>
-        <CardDescription>
-          Update team information in the database.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form id="form-team-edit" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      {/* Page Header */}
+      <div className="space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Edit Team</h2>
+        <p className="text-muted-foreground">
+          Update team information and members in the database.
+        </p>
+      </div>
+
+      <form id="form-team-edit" onSubmit={form.handleSubmit(onSubmit)}>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT/TOP: Team Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Team Details</CardTitle>
+              <CardDescription>
+                Update the team name, level, and school
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FieldGroup>
             {/* Team Name Field */}
             <Controller
               name="name"
@@ -182,25 +200,146 @@ export function TeamEditForm({ team, schools = [] }: TeamEditFormProps) {
                 </Field>
               )}
             />
+
+            {/* Level Select Field */}
+            <Controller
+              name="level"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-team-level">
+                    Level
+                  </FieldLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isPending}
+                  >
+                    <SelectTrigger
+                      id="form-team-level"
+                      className="w-full"
+                    >
+                      <SelectValue placeholder="Select level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="SMP">SMP</SelectItem>
+                      <SelectItem value="SMA">SMA</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldDescription>
+                    Select the education level for this team.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
           </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter>
-        {/* Action Buttons */}
-        <Field orientation="horizontal">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => form.reset()}
-            disabled={isPending}
-          >
-            Reset
-          </Button>
-          <Button type="submit" form="form-team-edit" disabled={isPending}>
-            Submit
-          </Button>
-        </Field>
-      </CardFooter>
-    </Card>
+            </CardContent>
+          </Card>
+
+          {/* RIGHT/BOTTOM: Team Members */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <CardTitle>Team Members</CardTitle>
+                  <CardDescription>
+                    Update team members
+                  </CardDescription>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => append({ name: "" })}
+                  disabled={isPending}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {fields.map((field, index) => (
+                <Card key={field.id} className="p-4 bg-muted/30">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        Member {index + 1}
+                      </span>
+                      {fields.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => remove(index)}
+                          disabled={isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Member Name */}
+                    <Controller
+                      name={`members.${index}.name`}
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <Input
+                            {...field}
+                            placeholder="Enter member name"
+                            disabled={isPending}
+                          />
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      )}
+                    />
+                  </div>
+                </Card>
+              ))}
+
+              {/* Form-level errors for members */}
+              {form.formState.errors.members && (
+                <FieldError
+                  errors={[
+                    {
+                      message:
+                        form.formState.errors.members.message ||
+                        form.formState.errors.members.root?.message ||
+                        "Invalid members",
+                    },
+                  ]}
+                />
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Action Bar */}
+        <Card className="mt-6">
+          <CardContent>
+            <Field orientation="horizontal">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+                disabled={isPending}
+              >
+                Reset Form
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Updating..." : "Update Team & Members"}
+              </Button>
+            </Field>
+          </CardContent>
+        </Card>
+      </form>
+    </div>
   );
 }

@@ -59,7 +59,45 @@ export function TeamDetail({ team }: TeamDetailProps) {
                 </dt>
                 <dd className="text-sm">{team.school.name ?? "-"}</dd>
               </div>
+              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                <dt className="text-muted-foreground text-sm font-medium">
+                  Level
+                </dt>
+                <dd className="text-sm">{team.level}</dd>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                <dt className="text-muted-foreground text-sm font-medium">
+                  Score
+                </dt>
+                <dd className="text-sm">{team.score}</dd>
+              </div>
             </div>
+          </div>
+
+          {/* Team Members */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold leading-none">
+              Team Members ({team.members.length})
+            </h3>
+            {team.members.length > 0 ? (
+              <div className="grid gap-3">
+                {team.members.map((member, index) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between p-3 border rounded-lg bg-muted/30"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                        {index + 1}
+                      </div>
+                      <span className="font-medium">{member.name}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No members found.</p>
+            )}
           </div>
         </div>
       </CardContent>

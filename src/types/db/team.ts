@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Prisma } from "@/generated/client/client";
+import { Level } from "@/generated/client/enums";
 
 // SCHEMA //
 export const TeamSchema = z.object({
@@ -8,6 +9,7 @@ export const TeamSchema = z.object({
     .string()
     .min(1, "Team name is required")
     .max(100, "Team name must be less than 100 characters"),
+  level: z.enum(Level, "Level is required and must be valid"),
 });
 
 export type Team = z.infer<typeof TeamSchema>;
@@ -19,6 +21,7 @@ export const TeamWithMembersSchema = z.object({
     .string()
     .min(1, "Team name is required")
     .max(100, "Team name must be less than 100 characters"),
+  level: z.enum(Level, "Level is required and must be valid"),
   members: z.array(z.object({
     name: z
       .string()

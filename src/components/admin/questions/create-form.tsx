@@ -8,12 +8,11 @@ import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2, X } from "lucide-react";
 
-import { createQuestionWithAnswers } from "@/services/question";
+import { createQuestion } from "@/services/question";
 import { deleteImage } from "@/services/image";
 import { QuestionWithAnswersSchema } from "@/types/db/question";
 
 import { UploadWidget } from "@/components/layout/upload-widget";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -48,7 +47,7 @@ export function QuestionCreateForm() {
     resolver: zodResolver(QuestionWithAnswersSchema),
     defaultValues: {
       title: "",
-      description: "",
+      level: "SMP",
       difficulty: "EASY",
       questionImages: [],
       answers: [
@@ -144,7 +143,7 @@ export function QuestionCreateForm() {
         questionImages,
       };
 
-      const result = await createQuestionWithAnswers(formData);
+      const result = await createQuestion(formData);
 
       if (result.error || !result.question) {
         toast.error(result.error || "Failed to create question.");
@@ -206,25 +205,31 @@ export function QuestionCreateForm() {
                   )}
                 />
 
-                {/* Question Description */}
+                {/* Level */}
                 <Controller
-                  name="description"
+                  name="level"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="form-question-description">
-                        Question Description
+                      <FieldLabel htmlFor="form-question-level">
+                        Level
                       </FieldLabel>
-                      <Textarea
-                        {...field}
+                      <Select
                         value={field.value}
-                        id="form-question-description"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Enter question description"
-                        autoComplete="off"
+                        onValueChange={field.onChange}
                         disabled={isPending}
-                        rows={8}
-                      />
+                      >
+                        <SelectTrigger
+                          id="form-question-level"
+                          className="w-full"
+                        >
+                          <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="SMP">SMP</SelectItem>
+                          <SelectItem value="SMA">SMA</SelectItem>
+                        </SelectContent>
+                      </Select>
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                       )}

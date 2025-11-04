@@ -26,28 +26,7 @@ export async function getQuestionById(questionId: string) {
   });
 }
 
-export async function createQuestion(data: z.infer<typeof QuestionSchema>) {
-  const result = QuestionSchema.safeParse(data);
-
-  if (!result.success) {
-    throw new Error("Invalid question data submitted");
-  }
-
-  try {
-    const question = await prisma.question.create({
-      data: result.data,
-    });
-
-    revalidatePath("/admin/questions");
-    revalidatePath("/admin/answers/create");
-
-    return { success: true, question: question };
-  } catch (err) {
-    return { error: "Failed to create question: " + (err as Error).message };
-  }
-}
-
-export async function createQuestionWithAnswers(
+export async function createQuestion(
   data: z.infer<typeof QuestionWithAnswersSchema>
 ) {
   const result = QuestionWithAnswersSchema.safeParse(data);
@@ -61,14 +40,14 @@ export async function createQuestionWithAnswers(
   }
 
   try {
-    const { title, description, difficulty, questionImages, answers } =
+    const { title, level, difficulty, questionImages, answers } =
       result.data;
 
     const question = await prisma.$transaction(async (tx) => {
       const newQuestion = await tx.question.create({
         data: {
           title,
-          description,
+          level,
           difficulty,
         },
       });

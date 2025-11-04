@@ -56,7 +56,7 @@ export async function createTeamWithMembers(
   }
 
   try {
-    const { schoolId, name, members } = result.data;
+    const { schoolId, name, level, members } = result.data;
 
     // Create team with members in a transaction
     const team = await prisma.$transaction(async (tx) => {
@@ -65,6 +65,7 @@ export async function createTeamWithMembers(
         data: {
           schoolId,
           name,
+          level,
         },
       });
 
@@ -115,6 +116,67 @@ export async function updateTeam(
   revalidatePath("/admin/teams");
 
   return team;
+}
+
+export async function updateTeamWithMembers(
+  teamId: string,
+  data: z.infer<typeof TeamWithMembersSchema>
+) {
+  const result = TeamWithMembersSchema.safeParse(data);
+
+  if (!result.success) {
+    return {
+      error: "Invalid team data: " + result.error.issues.map((e) => e.message).join(", ")
+    };
+  }
+
+  try {
+    const { schoolId, name, level, members } = result.data;
+
+    // Update team with members in a transaction
+    const team = await prisma.$transaction(async (tx) => {
+      // Update the team
+      await tx.team.update({
+        where: { id: teamId },
+        data: {
+          schoolId,
+          name,
+          level,
+        },
+      });
+
+      // Delete existing members
+      await tx.member.deleteMany({
+        where: { teamId },
+      });
+
+      // Create new members
+      if (members.length > 0) {
+        await tx.member.createMany({
+          data: members.map(member => ({
+            name: member.name,
+            teamId,
+          })),
+        });
+      }
+
+      // Fetch the complete team with all relations
+      return await tx.team.findUnique({
+        where: { id: teamId },
+        include: teamInclude,
+      });
+    });
+
+    revalidatePath("/admin/teams");
+    revalidatePath("/admin/members");
+
+    return { success: true, team };
+  } catch (err) {
+    console.error("Failed to update team with members:", err);
+    return {
+      error: "Failed to update team: " + (err as Error).message
+    };
+  }
 }
 
 export async function deleteTeam(teamId: string) {

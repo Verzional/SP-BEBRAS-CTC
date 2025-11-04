@@ -42,3 +42,6 @@ next-env.d.ts
 
 # prisma generated files
 /src/generated/client
+
+# seed file
+/prisma/seed.ts

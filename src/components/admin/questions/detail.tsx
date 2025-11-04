@@ -26,7 +26,9 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
   return (
     <Card className="gap-0">
       <CardHeader className="border-b">
-        <CardTitle className="text-lg font-semibold leading-none">{question.title}</CardTitle>
+        <CardTitle className="text-lg font-semibold leading-none">
+          {question.title}
+        </CardTitle>
         {/* Action Buttons */}
         <CardAction>
           <div className="flex gap-2">
@@ -53,10 +55,10 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
             <dl className="divide-y">
               <div className="grid grid-cols-[120px_1fr] gap-4 py-4">
                 <dt className="text-muted-foreground text-sm font-medium">
-                  Description
+                  Level
                 </dt>
-                <dd className="text-sm whitespace-pre-wrap">
-                  {question.description}
+                <dd className="text-sm">
+                  <Badge>{question.level}</Badge>
                 </dd>
               </div>
               <div className="grid grid-cols-[120px_1fr] gap-4 py-4">

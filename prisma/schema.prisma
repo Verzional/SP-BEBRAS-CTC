@@ -34,18 +34,19 @@ model Account {
 }
 
 model Team {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   postId   String?
   name     String
   schoolId String
-  score    Int    @default(0)
+  score    Int     @default(0)
+  level    Level
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  account         Account?
-  members         Member[]
-  submissions     Submission[]
+  account     Account?
+  members     Member[]
+  submissions Submission[]
 
   school School @relation(fields: [schoolId], references: [id])
   post   Post?  @relation(fields: [postId], references: [id])
@@ -82,10 +83,10 @@ enum Level {
 }
 
 model Post {
-  id          String  @id @default(cuid())
-  postNumber  String
-  picName     String
-  level       Level
+  id         String @id @default(cuid())
+  postNumber String
+  picName    String
+  level      Level
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -101,22 +102,22 @@ enum Difficulty {
 }
 
 model Question {
-  id          String     @id @default(cuid())
-  title       String
-  description String
-  difficulty  Difficulty
+  id         String     @id @default(cuid())
+  title      String
+  level      Level
+  difficulty Difficulty
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  images   Image[]
-  answers  Answer[]
+  images     Image[]
+  answers    Answer[]
   submission Submission[]
 }
 
 model Answer {
   id         String  @id @default(cuid())
-  content    String
+  content    String?
   questionId String
   correct    Boolean @default(false)
 
@@ -129,12 +130,12 @@ model Answer {
 }
 
 model Submission {
-  id         String   @id @default(cuid())
+  id         String  @id @default(cuid())
   teamId     String
   questionId String
   correct    Boolean @default(false)
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
   team     Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
   question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)

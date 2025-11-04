@@ -41,6 +41,7 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>
+          <TableHead>Level</TableHead>
           <TableHead>Difficulty</TableHead>
           <TableHead>Images</TableHead>
           <TableHead>Answers</TableHead>
@@ -57,6 +58,7 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
             <TableCell className="max-w-md truncate">
               {question.title}
             </TableCell>
+            <TableCell>{question.level}</TableCell>
             <TableCell>
               <Badge className={difficultyColors[question.difficulty]}>
                 {difficultyLabels[question.difficulty]}

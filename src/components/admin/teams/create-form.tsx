@@ -41,6 +41,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TeamCreateFormProps {
   schools?: School[];
@@ -54,6 +61,7 @@ export function TeamCreateForm({ schools = [] }: TeamCreateFormProps) {
     resolver: zodResolver(TeamWithMembersSchema),
     defaultValues: {
       name: "",
+      level: "SMP",
       schoolId: "",
       members: [{ name: "" }],
     },
@@ -185,6 +193,41 @@ export function TeamCreateForm({ schools = [] }: TeamCreateFormProps) {
                       </Popover>
                       <FieldDescription>
                         Search and select the school this team belongs to.
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                {/* Level Select Field */}
+                <Controller
+                  name="level"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-team-level">
+                        Level
+                      </FieldLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isPending}
+                      >
+                        <SelectTrigger
+                          id="form-team-level"
+                          className="w-full"
+                        >
+                          <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="SMP">SMP</SelectItem>
+                          <SelectItem value="SMA">SMA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FieldDescription>
+                        Select the education level for this team.
                       </FieldDescription>
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />

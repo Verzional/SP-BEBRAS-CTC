@@ -32,6 +32,7 @@ CREATE TABLE "Team" (
     "name" TEXT NOT NULL,
     "schoolId" TEXT NOT NULL,
     "score" INTEGER NOT NULL DEFAULT 0,
+    "level" "Level" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -68,6 +69,8 @@ CREATE TABLE "Post" (
     "postNumber" TEXT NOT NULL,
     "picName" TEXT NOT NULL,
     "level" "Level" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
 );
@@ -76,8 +79,7 @@ CREATE TABLE "Post" (
 CREATE TABLE "Question" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "code" SERIAL NOT NULL,
+    "level" "Level" NOT NULL,
     "difficulty" "Difficulty" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -88,7 +90,7 @@ CREATE TABLE "Question" (
 -- CreateTable
 CREATE TABLE "Answer" (
     "id" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
+    "content" TEXT,
     "questionId" TEXT NOT NULL,
     "correct" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -142,9 +144,6 @@ CREATE UNIQUE INDEX "Account_username_key" ON "Account"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_teamId_key" ON "Account"("teamId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Question_code_key" ON "Question"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Submission_teamId_questionId_key" ON "Submission"("teamId", "questionId");
