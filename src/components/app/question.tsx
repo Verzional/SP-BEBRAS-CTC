@@ -159,25 +159,24 @@ export function Question({ question, teamId }: QuestionProps) {
 
           <div className="space-y-2">
             {question.answers.map((answer) => (
-              <label
-                key={answer.id}
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="answer"
-                  value={answer.id}
-                  checked={selectedAnswerId === answer.id}
-                  onChange={(e) => setSelectedAnswerId(e.target.value)}
-                  className="w-4 h-4"
-                />
-                <span className="flex-1">{answer.content}</span>
+              <div key={answer.id} className="cursor-pointer">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="answer"
+                    value={answer.id}
+                    checked={selectedAnswerId === answer.id}
+                    onChange={(e) => setSelectedAnswerId(e.target.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="flex-1">{answer.content}</span>
+                </label>
                 {answer.images && answer.images.length > 0 && (
-                  <div className="flex gap-2">
+                  <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
                     {answer.images.map((image) => (
                       <div
                         key={image.id}
-                        className="relative w-16 h-16 border rounded-lg overflow-hidden"
+                        className="relative w-full h-32 border rounded-lg overflow-hidden"
                       >
                         <Image
                           src={image.url}
@@ -189,7 +188,7 @@ export function Question({ question, teamId }: QuestionProps) {
                     ))}
                   </div>
                 )}
-              </label>
+              </div>
             ))}
           </div>
 
