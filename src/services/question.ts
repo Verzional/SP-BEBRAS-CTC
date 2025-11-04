@@ -41,6 +41,7 @@ export async function createQuestion(data: z.infer<typeof QuestionSchema>) {
     });
 
     revalidatePath("/admin/questions");
+    revalidatePath("/admin/answers/create");
 
     return { success: true, question: question };
   } catch (err) {
@@ -64,6 +65,7 @@ export async function updateQuestion(
   });
 
   revalidatePath("/admin/questions");
+  revalidatePath("/admin/answers/create");
 
   return question;
 }
@@ -75,6 +77,7 @@ export async function deleteQuestion(questionId: string) {
     });
 
     revalidatePath("/admin/questions");
+    revalidatePath("/admin/answers/create");
 
     return { success: true, deleted };
   } catch (err) {
@@ -153,7 +156,9 @@ export async function checkTeamSubmission(
       return { error: "Team not found." };
     }
 
-    const question = await prisma.question.findUnique({ where: { id: questionId } });
+    const question = await prisma.question.findUnique({
+      where: { id: questionId },
+    });
 
     if (!question) {
       return { error: "Question not found." };
@@ -162,11 +167,11 @@ export async function checkTeamSubmission(
     const correctAnswer = await prisma.answer.findFirst({
       where: { questionId: questionId, correct: true },
     });
-    
+
     if (!correctAnswer) {
       return { error: "No correct answer found for this question." };
     }
-    
+
     const correct = correctAnswer.id === answerId;
 
     await prisma.submission.create({
