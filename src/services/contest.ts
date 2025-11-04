@@ -25,8 +25,8 @@ export async function startContest(formData: FormData) {
     throw new Error("Unauthorized");
   }
 
-  const durationHours = formData.get("durationHours") as string;
-  const duration = Number(durationHours);
+  const durationMinutes = formData.get("durationMinutes") as string;
+  const duration = Number(durationMinutes);
 
   if (!duration || duration <= 0) {
     throw new Error("Invalid contest duration.");
@@ -44,7 +44,7 @@ export async function startContest(formData: FormData) {
     data: {
       status: ContestStatus.RUNNING,
       startTime: now,
-      endTime: new Date(now.getTime() + duration * 60 * 60 * 1000),
+      endTime: new Date(now.getTime() + duration * 60 * 1000),
       pausedTime: null,
       totalPausedDuration: 0,
     },

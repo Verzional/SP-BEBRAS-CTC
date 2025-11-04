@@ -39,7 +39,7 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
 
   const [isLoading, setIsLoading] = useState<Action | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [durationHours, setDurationHours] = useState(2);
+  const [durationMinutes, setDurationMinutes] = useState(90);
 
   useEffect(() => {
     const channel = pusherClient.subscribe("contest-channel");
@@ -60,7 +60,7 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       switch (action) {
         case "start":
           const formData = new FormData();
-          formData.append("durationHours", durationHours.toString());
+          formData.append("durationMinutes", durationMinutes.toString());
           await startContest(formData);
           break;
         case "pause":
@@ -240,14 +240,14 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
         {(status === ContestStatus.PENDING ||
           status === ContestStatus.FINISHED) && (
           <div className="space-y-2">
-            <Label htmlFor="duration">Contest Duration (hours)</Label>
+            <Label htmlFor="duration">Contest Duration (minutes)</Label>
             <Input
               id="duration"
               type="number"
-              value={durationHours}
-              onChange={(e) => setDurationHours(Number(e.target.value))}
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(Number(e.target.value))}
               min={1}
-              max={24}
+              max={480}
               className="w-full"
             />
           </div>
