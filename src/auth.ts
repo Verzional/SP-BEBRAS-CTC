@@ -2,10 +2,8 @@ import prisma from "@/lib/prisma";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
-import { verifySync } from "@node-rs/bcrypt";
+import { verify } from "@node-rs/bcrypt";
 import { createId } from "@paralleldrive/cuid2";
-
-const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 1 day
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -17,62 +15,63 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
-          throw new Error("Invalid credentials");
+        try {
+          if (!credentials?.username || !credentials?.password) {
+            return null;
+          }
+
+          const account = await prisma.account.findUnique({
+            where: { username: credentials.username as string },
+          });
+
+          if (!account || !account.password) {
+            console.warn(
+              `Auth attempt: User not found (${credentials.username})`
+            );
+            return null;
+          }
+
+          const isPasswordValid = await verify(
+            credentials.password as string,
+            account.password
+          );
+
+          if (!isPasswordValid) {
+            console.warn(
+              `Auth attempt: Invalid password for ${credentials.username}`
+            );
+            return null;
+          }
+
+          return {
+            id: account.id,
+            username: account.username,
+            name: account.name,
+            role: account.role,
+            teamId: account.teamId,
+          };
+        } catch (error) {
+          console.error("CRITICAL AUTHORIZE ERROR:", error);
+          return null;
         }
-
-        const account = await prisma.account.findUnique({
-          where: { username: credentials.username as string },
-        });
-
-        if (!account) {
-          throw new Error("Account not found");
-        }
-
-        if (!account.password) {
-          throw new Error("No password set for this account");
-        }
-
-        const isPasswordValid = verifySync(
-          credentials.password as string,
-          account.password
-        );
-
-        if (!isPasswordValid) {
-          throw new Error("Invalid credentials");
-        }
-
-        const sessionToken = createId();
-
-        const updatedAccount = await prisma.account.update({
-          where: { id: account.id },
-          data: { sessionToken: sessionToken },
-        });
-
-        if (!updatedAccount) {
-          throw new Error("Failed to update account session");
-        }
-        return {
-          id: updatedAccount.id,
-          username: updatedAccount.username,
-          name: updatedAccount.name,
-          role: updatedAccount.role,
-          teamId: updatedAccount.teamId,
-          activeSessionToken: updatedAccount.sessionToken,
-        };
       },
     }),
   ],
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 1 day
   },
   events: {
     async signOut(message) {
-      if ("token" in message && message.token?.id) {
-        await prisma.account.update({
-          where: { id: message.token.id as string },
-          data: { sessionToken: null },
-        });
+      try {
+        if ("token" in message && message.token?.id) {
+          await prisma.account.update({
+            where: { id: message.token.id as string },
+            data: { sessionToken: null },
+          });
+        }
+      } catch (error) {
+        console.error("SignOut Event Error:", error);
       }
     },
   },
@@ -84,40 +83,50 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
+
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.username = user.username;
-        token.role = user.role;
-        token.teamId = user.teamId;
-        token.activeSessionToken = user.activeSessionToken;
-        token.sessionCreatedAt = Date.now();
-      } else {
-        if (
-          token.sessionCreatedAt &&
-          Date.now() - (token.sessionCreatedAt as number) > SESSION_TIMEOUT
-        ) {
-          throw new Error("Session expired due to inactivity");
+      try {
+        if (user) {
+          const sessionToken = createId();
+
+          await prisma.account.update({
+            where: { id: user.id },
+            data: { sessionToken: sessionToken },
+          });
+
+          token.id = user.id;
+          token.username = user.username;
+          token.role = user.role;
+          token.teamId = user.teamId;
+          token.activeSessionToken = sessionToken;
+
+          return token;
         }
+
         if (token.id && token.activeSessionToken) {
           const currentAccount = await prisma.account.findUnique({
             where: { id: token.id as string },
             select: { sessionToken: true },
           });
+
           if (
             !currentAccount ||
             currentAccount.sessionToken !== token.activeSessionToken
           ) {
-            throw new Error(
-              "Session invalidated - logged in from another device"
-            );
+            return null;
           }
+        } else {
+          return null;
         }
+
+        return token;
+      } catch (error) {
+        console.error("JWT Callback Error:", error);
+        return null;
       }
-      return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string;
         session.user.username = token.username as string;
         session.user.role = token.role!;

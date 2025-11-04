@@ -87,7 +87,7 @@ jobs:
             pnpm prisma:deploy
 
             echo "🔄 Reloading application..."
-            pm2 reload ${{ vars.PM2_APP_NAME }}
+            pm2 restart ${{ vars.PM2_APP_NAME }}
 
             echo "🗑️ Cleaning up..."
             rm deploy.zip
