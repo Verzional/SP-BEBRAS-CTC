@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getTeamById } from "@/services/team";
+import { getTeamById, getTeamRank } from "@/services/team";
 import { Dashboard } from "@/components/app/dashboard";
 
 export default async function DashboardPage() {
@@ -16,9 +16,11 @@ export default async function DashboardPage() {
     return <div>Team not found</div>;
   }
 
+  const rank = await getTeamRank(session.user.teamId);
+
   return (
     <>
-      <Dashboard team={team} />
+      <Dashboard team={team} rank={rank ?? undefined} />
     </>
   );
 }

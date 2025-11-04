@@ -31,12 +31,35 @@ interface Team {
 
 interface DashboardProps {
   team: Team;
+  rank?: number;
 }
 
-export function Dashboard({ team }: DashboardProps) {
+const getMedalCategory = (rank: number) => {
+  if (rank >= 1 && rank <= 5) return "GOLD";
+  if (rank >= 6 && rank <= 10) return "SILVER";
+  if (rank >= 11 && rank <= 15) return "BRONZE";
+  return "WOOD";
+};
+
+const getMedalBgClass = (category: string) => {
+  switch (category) {
+    case "GOLD":
+      return "bg-yellow-500 text-white";
+    case "SILVER":
+      return "bg-gray-400 text-white";
+    case "BRONZE":
+      return "bg-amber-600 text-white";
+    default:
+      return "bg-amber-800 text-white";
+  }
+};
+
+export function Dashboard({ team, rank }: DashboardProps) {
   const router = useRouter();
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [qrSize] = useState(() => Math.min(250, window.innerWidth * 0.6));
+
+  const medalCategory = rank ? getMedalCategory(rank) : null;
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`team-${team.id}`);
@@ -68,6 +91,14 @@ export function Dashboard({ team }: DashboardProps) {
             <CardTitle className="flex items-center gap-2">
               Team Information
               <Badge variant="secondary">Score: {team.score}</Badge>
+              {medalCategory && (
+                <Badge
+                  variant="default"
+                  className={getMedalBgClass(medalCategory)}
+                >
+                  {medalCategory}
+                </Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

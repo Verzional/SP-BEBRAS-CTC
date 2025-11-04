@@ -131,3 +131,28 @@ export async function deleteTeam(teamId: string) {
     return { success: false, error: "Failed to delete team." };
   }
 }
+
+export async function getTeamRank(teamId: string): Promise<number | null> {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+    select: { score: true, createdAt: true },
+  });
+
+  if (!team) {
+    return null;
+  }
+
+  const rank = await prisma.team.count({
+    where: {
+      OR: [
+        { score: { gt: team.score } },
+        {
+          score: team.score,
+          createdAt: { lt: team.createdAt },
+        },
+      ],
+    },
+  });
+
+  return rank + 1;
+}

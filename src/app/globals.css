@@ -77,6 +77,10 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.708 0 0);
+  --medal-gold: oklch(0.8868 0.182186 95.3305)
+  --medal-silver: oklch(0.752 0.017 91.318);
+  --medal-bronze: oklch(0.552 0.211 40.318);
+  --medal-wood: oklch(0.424 0.199 25.918);
 }
 
 .dark {

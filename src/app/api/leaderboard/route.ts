@@ -42,51 +42,39 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const [users, totalUsers] = await prisma.$transaction([
-      prisma.account.findMany({
-        where: {
-          role: "USER",
-          teamId: { not: null },
-        },
-        orderBy: [{ team: { score: "desc" } }, { createdAt: "asc" }],
+    const [teams, totalTeams] = await prisma.$transaction([
+      prisma.team.findMany({
+        orderBy: [{ score: "desc" }, { createdAt: "asc" }],
         skip: skip,
         take: limit,
         select: {
           id: true,
-          username: true,
-          teamId: true,
-          team: {
+          name: true,
+          score: true,
+          account: {
             select: {
-              id: true,
               name: true,
-              score: true,
             },
           },
         },
       }),
-      prisma.account.count({
-        where: {
-          role: "USER",
-          teamId: { not: null },
-        },
-      }),
+      prisma.team.count(),
     ]);
 
-    const leaderboardData = users.map((account) => ({
-      accountId: account.id,
-      username: account.username,
-      teamId: account.teamId,
-      teamName: account.team?.name,
-      score: account.team?.score || 0,
+    const leaderboardData = teams.map((team) => ({
+      id: team.id,
+      name: team.account?.name || team.name,
+      image: null,
+      score: team.score,
     }));
 
     return NextResponse.json({
       data: leaderboardData,
       meta: {
-        totalUsers,
+        totalUsers: totalTeams,
         page,
         limit,
-        totalPages: Math.ceil(totalUsers / limit),
+        totalPages: Math.ceil(totalTeams / limit),
         isFrozen: false,
       },
     });
