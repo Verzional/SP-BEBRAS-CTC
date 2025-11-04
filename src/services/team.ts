@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { TeamSchema } from "@/types/db/team";
+import { TeamSchema, TeamWithMembersSchema, teamInclude } from "@/types/db/team";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -41,6 +41,59 @@ export async function createTeam(data: z.infer<typeof TeamSchema>) {
     return { success: true, team };
   } catch (err) {
     return { error: "Failed to create team: " + (err as Error).message };
+  }
+}
+
+export async function createTeamWithMembers(
+  data: z.infer<typeof TeamWithMembersSchema>
+) {
+  const result = TeamWithMembersSchema.safeParse(data);
+
+  if (!result.success) {
+    return {
+      error: "Invalid team data: " + result.error.issues.map((e) => e.message).join(", ")
+    };
+  }
+
+  try {
+    const { schoolId, name, members } = result.data;
+
+    // Create team with members in a transaction
+    const team = await prisma.$transaction(async (tx) => {
+      // Create the team
+      const newTeam = await tx.team.create({
+        data: {
+          schoolId,
+          name,
+        },
+      });
+
+      // Create members for the team
+      if (members.length > 0) {
+        await tx.member.createMany({
+          data: members.map(member => ({
+            name: member.name,
+            teamId: newTeam.id,
+          })),
+        });
+      }
+
+      // Fetch the complete team with all relations
+      return await tx.team.findUnique({
+        where: { id: newTeam.id },
+        include: teamInclude,
+      });
+    });
+
+    revalidatePath("/admin/teams");
+    revalidatePath("/admin/members");
+
+    return { success: true, team };
+  } catch (err) {
+    console.error("Failed to create team with members:", err);
+    return {
+      error: "Failed to create team: " + (err as Error).message
+    };
   }
 }
 

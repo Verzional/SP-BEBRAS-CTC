@@ -84,7 +84,7 @@ export function MemberEditForm({ member, teams = [] }: MemberEditFormProps) {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       <CardHeader>
         <CardTitle>Edit Member</CardTitle>
         <CardDescription>

@@ -2,12 +2,18 @@
 
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { pusherClient } from "@/lib/pusher";
 import { QRCode } from "@/components/admin/core/qr-code";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Team {
   id: string;
@@ -29,6 +35,7 @@ interface DashboardProps {
 
 export function Dashboard({ team }: DashboardProps) {
   const router = useRouter();
+  const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`team-${team.id}`);
@@ -85,9 +92,14 @@ export function Dashboard({ team }: DashboardProps) {
             <CardTitle>Team QR Code</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
-            <QRCode team={team} size={200} />
+            <div
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setIsQRDialogOpen(true)}
+            >
+              <QRCode team={team} size={200} />
+            </div>
             <p className="text-sm text-muted-foreground text-center">
-              Show this QR code to the admin to get questions
+              Click QR code to enlarge or show to admin to get questions
             </p>
           </CardContent>
         </Card>
@@ -109,6 +121,24 @@ export function Dashboard({ team }: DashboardProps) {
           </ol>
         </CardContent>
       </Card>
+
+      {/* QR Code Zoom Dialog */}
+      <Dialog
+        open={isQRDialogOpen}
+        onOpenChange={(open) => !open && setIsQRDialogOpen(false)}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{team.name} - QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center space-y-4 p-6">
+            <QRCode team={team} size={400} />
+            <p className="text-sm text-muted-foreground text-center">
+              Show this QR code to the admin to receive questions
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

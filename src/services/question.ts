@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { pusherServer } from "@/lib/pusher";
-import { QuestionSchema, questionInclude } from "@/types/db/question";
+import { QuestionSchema, QuestionWithAnswersSchema, questionInclude } from "@/types/db/question";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -40,6 +40,83 @@ export async function createQuestion(data: z.infer<typeof QuestionSchema>) {
     return { success: true, question: question };
   } catch (err) {
     return { error: "Failed to create question: " + (err as Error).message };
+  }
+}
+
+export async function createQuestionWithAnswers(
+  data: z.infer<typeof QuestionWithAnswersSchema>
+) {
+  const result = QuestionWithAnswersSchema.safeParse(data);
+
+  if (!result.success) {
+    return { 
+      error: "Invalid question data: " + result.error.issues.map((e) => e.message).join(", ") 
+    };
+  }
+
+  try {
+    const { title, description, difficulty, questionImages, answers } = result.data;
+
+    // Create question with answers and images in a transaction
+    const question = await prisma.$transaction(async (tx) => {
+      // Create the question
+      const newQuestion = await tx.question.create({
+        data: {
+          title,
+          description,
+          difficulty,
+        },
+      });
+
+      // Create question images
+      if (questionImages.length > 0) {
+        await tx.image.createMany({
+          data: questionImages.map(img => ({
+            url: img.url,
+            publicId: img.publicId,
+            questionId: newQuestion.id,
+          })),
+        });
+      }
+
+      // Create answers with their images
+      for (const answer of answers) {
+        const newAnswer = await tx.answer.create({
+          data: {
+            content: answer.content,
+            correct: answer.correct,
+            questionId: newQuestion.id,
+          },
+        });
+
+        // Create answer images if any
+        if (answer.images.length > 0) {
+          await tx.image.createMany({
+            data: answer.images.map(img => ({
+              url: img.url,
+              publicId: img.publicId,
+              answerId: newAnswer.id,
+            })),
+          });
+        }
+      }
+
+      // Fetch the complete question with all relations
+      return await tx.question.findUnique({
+        where: { id: newQuestion.id },
+        include: questionInclude,
+      });
+    });
+
+    revalidatePath("/admin/questions");
+    revalidatePath("/admin/answers/create");
+
+    return { success: true, question };
+  } catch (err) {
+    console.error("Failed to create question with answers:", err);
+    return { 
+      error: "Failed to create question: " + (err as Error).message 
+    };
   }
 }
 

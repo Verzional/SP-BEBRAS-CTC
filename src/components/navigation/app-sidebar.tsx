@@ -9,10 +9,8 @@ import {
   SignpostBig,
   School,
   UsersRound,
-  UserRound,
   CircleUserRound,
   BadgeQuestionMark,
-  BadgeCheck,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -90,21 +88,6 @@ const data = {
       ],
     },
     {
-      title: "Members",
-      url: "#",
-      icon: UserRound,
-      items: [
-        {
-          title: "Member List",
-          url: "/admin/members",
-        },
-        {
-          title: "Create Member",
-          url: "/admin/members/create",
-        },
-      ],
-    },
-    {
       title: "Accounts",
       url: "#",
       icon: CircleUserRound,
@@ -131,17 +114,6 @@ const data = {
         {
           title: "Create Question",
           url: "/admin/questions/create",
-        },
-      ],
-    },
-    {
-      title: "Answers",
-      url: "#",
-      icon: BadgeCheck,
-      items: [
-        {
-          title: "Create Answer",
-          url: "/admin/answers/create",
         },
       ],
     },

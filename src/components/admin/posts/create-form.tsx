@@ -60,7 +60,7 @@ export function PostCreateForm() {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       <CardHeader>
         <CardTitle>Create Post</CardTitle>
         <CardDescription>Add a new post to the competition.</CardDescription>

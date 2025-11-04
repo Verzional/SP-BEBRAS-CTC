@@ -61,7 +61,7 @@ export function SchoolCreateForm() {
     }
 
     return (
-      <Card className="w-full sm:max-w-md">
+      <Card>
         {/* Card Header */}
         <CardHeader>
           <CardTitle>Create School</CardTitle>

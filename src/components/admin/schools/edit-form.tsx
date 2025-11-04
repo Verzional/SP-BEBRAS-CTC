@@ -74,7 +74,7 @@ export function SchoolEditForm({ school }: SchoolEditFormProps) {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       {/* Card Header */}
       <CardHeader>
         <CardTitle>Edit School</CardTitle>

@@ -16,6 +16,7 @@ import { Question, Image as ImageType } from "@/generated/client/client";
 import { UploadWidget } from "@/components/layout/upload-widget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -137,7 +138,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       {/* Card Header */}
       <CardHeader>
         <CardTitle>Edit Question</CardTitle>
@@ -145,10 +146,12 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
           Update question information in the database.
         </CardDescription>
       </CardHeader>
+
+      {/* Card Content - Form */}
       <CardContent>
         <form id="form-question-edit" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
-            {/* Question Title Field */}
+            {/* Question Title */}
             <Controller
               name="title"
               control={form.control}
@@ -172,7 +175,8 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                 </Field>
               )}
             />
-            {/* Question Description Field */}
+
+            {/* Question Description */}
             <Controller
               name="description"
               control={form.control}
@@ -181,7 +185,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                   <FieldLabel htmlFor="form-question-edit-description">
                     Question Description
                   </FieldLabel>
-                  <Input
+                  <Textarea
                     {...field}
                     value={field.value}
                     id="form-question-edit-description"
@@ -189,6 +193,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                     placeholder="Enter question description"
                     autoComplete="off"
                     disabled={isPending}
+                    rows={8}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -196,7 +201,8 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                 </Field>
               )}
             />
-            {/* Difficulty Field */}
+
+            {/* Question Difficulty */}
             <Controller
               name="difficulty"
               control={form.control}
@@ -228,6 +234,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                 </Field>
               )}
             />
+
             {/* Existing Images */}
             {existingImages.length > 0 && (
               <Field>
@@ -236,7 +243,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                   {existingImages.map((img) => (
                     <div
                       key={img.id}
-                      className="flex items-center space-x-3 p-2 border rounded-md bg-gray-50"
+                      className="flex items-center space-x-3 p-2 border rounded-md"
                     >
                       <Image
                         src={img.url}
@@ -261,6 +268,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                 </div>
               </Field>
             )}
+
             {/* New Images Upload */}
             <Field>
               <FieldLabel>Add New Images (Optional)</FieldLabel>
@@ -302,6 +310,8 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
           </FieldGroup>
         </form>
       </CardContent>
+
+      {/* Card Footer - Action Buttons */}
       <CardFooter>
         {/* Action Buttons */}
         <Field orientation="horizontal">

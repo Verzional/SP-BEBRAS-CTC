@@ -83,7 +83,7 @@ export function AccountCreateForm({ teams = [] }: AccountCreateFormProps) {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       {/* Card Header */}
       <CardHeader>
         <CardTitle>Create Account</CardTitle>

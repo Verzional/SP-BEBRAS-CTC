@@ -35,10 +35,6 @@ export async function startContest(formData: FormData) {
   const contest = await getActiveContest();
   const now = new Date();
 
-  if (contest.status !== ContestStatus.PENDING) {
-    throw new Error("Contest has already started.");
-  }
-
   const updatedContest = await prisma.contest.update({
     where: { id: contest.id },
     data: {

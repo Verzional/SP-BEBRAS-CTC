@@ -5,7 +5,7 @@ export default function AppLayout({
 }>) {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-2xl">{children}</div>
+      <div className="w-full max-w-6xl">{children}</div>
     </div>
   );
 }

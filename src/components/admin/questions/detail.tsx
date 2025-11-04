@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteQuestion } from "@/services/question";
@@ -15,7 +14,6 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
   CardAction,
 } from "@/components/ui/card";
@@ -26,10 +24,9 @@ interface QuestionDetailProps {
 
 export function QuestionDetail({ question }: QuestionDetailProps) {
   return (
-    <Card>
+    <Card className="gap-0">
       <CardHeader className="border-b">
-        <CardTitle>{question.title}</CardTitle>
-        <CardDescription>View and manage question details</CardDescription>
+        <CardTitle className="text-lg font-semibold leading-none">{question.title}</CardTitle>
         {/* Action Buttons */}
         <CardAction>
           <div className="flex gap-2">
@@ -53,23 +50,16 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
         <div className="space-y-6">
           {/* Basic Information Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold leading-none">
-              Basic Information
-            </h3>
             <dl className="divide-y">
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  Title
-                </dt>
-                <dd className="text-sm">{question.title}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+              <div className="grid grid-cols-[120px_1fr] gap-4 py-4">
                 <dt className="text-muted-foreground text-sm font-medium">
                   Description
                 </dt>
-                <dd className="text-sm">{question.description}</dd>
+                <dd className="text-sm whitespace-pre-wrap">
+                  {question.description}
+                </dd>
               </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+              <div className="grid grid-cols-[120px_1fr] gap-4 py-4">
                 <dt className="text-muted-foreground text-sm font-medium">
                   Difficulty
                 </dt>
@@ -112,14 +102,7 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
               </h3>
               <div className="space-y-2">
                 {question.answers.map((answer, index) => (
-                  <div
-                    key={answer.id}
-                    className={`p-3 rounded-md border ${
-                      answer.correct
-                        ? "bg-green-50 border-green-200"
-                        : "bg-gray-50"
-                    }`}
-                  >
+                  <div key={answer.id} className="p-3 rounded-md border">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -132,8 +115,8 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-background">
-                          {answer.content} 
+                        <p className="text-sm text-foreground">
+                          {answer.content}
                         </p>
                       </div>
                       {answer.images && answer.images.length > 0 && (
@@ -141,13 +124,13 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                           {answer.images.map((image) => (
                             <div
                               key={image.id}
-                              className="relative w-16 h-16 border rounded-lg overflow-hidden"
+                              className="relative w-16 h-8 border rounded-lg overflow-hidden"
                             >
                               <Image
                                 src={image.url}
                                 alt={`Answer image ${image.id}`}
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                               />
                             </div>
                           ))}

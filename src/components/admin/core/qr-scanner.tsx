@@ -52,7 +52,7 @@ export function QRScanner() {
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center">
       <Scanner
         onScan={handleScan}
         onError={handleError}
@@ -60,7 +60,7 @@ export function QRScanner() {
           facingMode: "environment",
         }}
         styles={{
-          container: { width: "100%" },
+          container: { width: "75%" },
           video: {
             transform: "scaleX(-1)",
           },
@@ -73,6 +73,6 @@ export function QRScanner() {
       {error && (
         <p className="text-center mt-4 text-destructive font-medium">{error}</p>
       )}
-    </>
+    </div>
   );
 }

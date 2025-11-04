@@ -69,7 +69,7 @@ export function PostEditForm({ post }: PostEditFormProps) {
   }
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card>
       <CardHeader>
         <CardTitle>Edit Post</CardTitle>
         <CardDescription>
