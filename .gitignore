@@ -45,3 +45,5 @@ next-env.d.ts
 
 # seed file
 /prisma/seed.ts
+
+bebras-app.tar
