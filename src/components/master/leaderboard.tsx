@@ -124,7 +124,7 @@ export function Leaderboard() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Leaderboard</h1>
         {isFrozen && (
@@ -168,6 +168,9 @@ export function Leaderboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-lg font-semibold truncate">
                         {user.name || "Anonymous"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Score: {user.score}
                       </p>
                     </div>
                   </div>
