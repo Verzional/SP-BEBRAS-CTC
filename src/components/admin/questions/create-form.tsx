@@ -13,6 +13,7 @@ import { deleteImage } from "@/services/image";
 import { QuestionWithAnswersSchema } from "@/types/db/question";
 
 import { UploadWidget } from "@/components/layout/upload-widget";
+import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -42,6 +43,15 @@ export function QuestionCreateForm() {
   const [questionImages, setQuestionImages] = useState<
     { url: string; publicId: string }[]
   >([]);
+  const [showQuestionImageDeleteDialog, setShowQuestionImageDeleteDialog] =
+    useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [showAnswerImageDeleteDialog, setShowAnswerImageDeleteDialog] =
+    useState(false);
+  const [answerImageToDelete, setAnswerImageToDelete] = useState<{
+    publicId: string;
+    answerIndex: number;
+  } | null>(null);
 
   const form = useForm<z.infer<typeof QuestionWithAnswersSchema>>({
     resolver: zodResolver(QuestionWithAnswersSchema),
@@ -85,6 +95,35 @@ export function QuestionCreateForm() {
     }
   }
 
+  const handleConfirmQuestionImageDelete = async () => {
+    if (imageToDelete) {
+      await handleRemoveQuestionImage(imageToDelete);
+      setImageToDelete(null);
+    }
+  };
+
+  const handleConfirmAnswerImageDelete = async () => {
+    if (!answerImageToDelete) return;
+
+    const result = await deleteImage(answerImageToDelete.publicId);
+    if (result.success) {
+      const currentImages = form.getValues(
+        `answers.${answerImageToDelete.answerIndex}.images`
+      );
+      form.setValue(
+        `answers.${answerImageToDelete.answerIndex}.images`,
+        currentImages.filter(
+          (img) => img.publicId !== answerImageToDelete.publicId
+        )
+      );
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+    setAnswerImageToDelete(null);
+    setShowAnswerImageDeleteDialog(false);
+  };
+
   function handleAnswerImageUpload(
     answerIndex: number,
     url: string,
@@ -107,26 +146,15 @@ export function QuestionCreateForm() {
     answerIndex: number,
     publicIdToRemove: string
   ) {
-    const result = await deleteImage(publicIdToRemove);
-    if (result.success) {
-      const currentImages = form.getValues(`answers.${answerIndex}.images`);
-      form.setValue(
-        `answers.${answerIndex}.images`,
-        currentImages.filter((img) => img.publicId !== publicIdToRemove)
-      );
-      toast.success("Image removed.");
-    } else {
-      toast.error(result.error || "Failed to remove image.");
-    }
+    setAnswerImageToDelete({ publicId: publicIdToRemove, answerIndex });
+    setShowAnswerImageDeleteDialog(true);
   }
 
   async function cleanupAllImages() {
-    // Clean up question images
     for (const img of questionImages) {
       await deleteImage(img.publicId);
     }
 
-    // Clean up answer images
     const answers = form.getValues("answers");
     for (const answer of answers) {
       for (const img of answer.images) {
@@ -137,7 +165,6 @@ export function QuestionCreateForm() {
 
   function onSubmit(data: z.infer<typeof QuestionWithAnswersSchema>) {
     startTransition(async () => {
-      // Add question images to the form data
       const formData = {
         ...data,
         questionImages,
@@ -297,9 +324,10 @@ export function QuestionCreateForm() {
                           </span>
                           <button
                             type="button"
-                            onClick={() =>
-                              handleRemoveQuestionImage(img.publicId)
-                            }
+                            onClick={() => {
+                              setImageToDelete(img.publicId);
+                              setShowQuestionImageDeleteDialog(true);
+                            }}
                             className="text-red-600 hover:text-red-800 transition-colors"
                             disabled={isPending}
                           >
@@ -414,18 +442,22 @@ export function QuestionCreateForm() {
                           />
                           {imagesField.value &&
                             imagesField.value.length > 0 && (
-                              <div className="mt-2 grid grid-cols-3 gap-2">
+                              <div className="mt-2 space-y-2">
                                 {imagesField.value.map((img) => (
                                   <div
                                     key={img.publicId}
-                                    className="relative group aspect-square"
+                                    className="flex items-center space-x-3 p-2 border rounded-md"
                                   >
                                     <Image
                                       src={img.url}
                                       alt="Answer"
-                                      fill
+                                      width={60}
+                                      height={60}
                                       className="object-cover rounded border"
                                     />
+                                    <span className="text-sm text-muted-foreground flex-1 truncate">
+                                      {img.publicId.split("/").pop()}
+                                    </span>
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -434,10 +466,10 @@ export function QuestionCreateForm() {
                                           img.publicId
                                         )
                                       }
-                                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="text-red-600 hover:text-red-800 transition-colors"
                                       disabled={isPending}
                                     >
-                                      <X className="w-3 h-3" />
+                                      <X className="w-4 h-4" />
                                     </button>
                                   </div>
                                 ))}
@@ -489,6 +521,26 @@ export function QuestionCreateForm() {
           </CardContent>
         </Card>
       </form>
+
+      <ConfirmDialog
+        open={showQuestionImageDeleteDialog}
+        onOpenChange={setShowQuestionImageDeleteDialog}
+        title="Delete Question Image"
+        description="Are you sure you want to delete this question image? This action cannot be undone."
+        onConfirm={handleConfirmQuestionImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showAnswerImageDeleteDialog}
+        onOpenChange={setShowAnswerImageDeleteDialog}
+        title="Delete Answer Image"
+        description="Are you sure you want to delete this answer image? This action cannot be undone."
+        onConfirm={handleConfirmAnswerImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

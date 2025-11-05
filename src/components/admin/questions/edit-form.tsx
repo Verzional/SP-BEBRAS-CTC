@@ -19,6 +19,7 @@ import {
 } from "@/generated/client/client";
 
 import { UploadWidget } from "@/components/layout/upload-widget";
+import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -59,6 +60,24 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
   const [existingImages, setExistingImages] = useState<ImageType[]>(
     question.images || []
   );
+  const [showQuestionImageDeleteDialog, setShowQuestionImageDeleteDialog] =
+    useState(false);
+  const [imageToDelete, setImageToDelete] = useState<ImageType | null>(null);
+  const [showNewImageDeleteDialog, setShowNewImageDeleteDialog] =
+    useState(false);
+  const [newImageToDelete, setNewImageToDelete] = useState<string | null>(null);
+  const [showAnswerImageDeleteDialog, setShowAnswerImageDeleteDialog] =
+    useState(false);
+  const [answerImageToDelete, setAnswerImageToDelete] = useState<{
+    publicId: string;
+    answerIndex: number;
+  } | null>(null);
+  const [
+    showExistingAnswerImageDeleteDialog,
+    setShowExistingAnswerImageDeleteDialog,
+  ] = useState(false);
+  const [existingAnswerImageToDelete, setExistingAnswerImageToDelete] =
+    useState<{ imageId: string; answerIndex: number } | null>(null);
 
   const form = useForm<z.infer<typeof QuestionUpdateSchema>>({
     resolver: zodResolver(QuestionUpdateSchema),
@@ -93,28 +112,90 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
   }
 
   async function handleRemoveNewImage(publicIdToRemove: string) {
-    const result = await deleteImage(publicIdToRemove);
-    if (result.success) {
-      setUploadedImages((prev) =>
-        prev.filter((img) => img.publicId !== publicIdToRemove)
-      );
-      toast.success("Image removed.");
-    } else {
-      toast.error(result.error || "Failed to remove image.");
-    }
+    setNewImageToDelete(publicIdToRemove);
+    setShowNewImageDeleteDialog(true);
   }
 
   async function handleRemoveExistingImage(imageId: string) {
     const imageToRemove = existingImages.find((img) => img.id === imageId);
     if (!imageToRemove) return;
 
-    const result = await deleteImage(imageToRemove.publicId);
+    setImageToDelete(imageToRemove);
+    setShowQuestionImageDeleteDialog(true);
+  }
+
+  async function handleConfirmQuestionImageDelete() {
+    if (!imageToDelete) return;
+
+    const result = await deleteImage(imageToDelete.publicId);
     if (result.success) {
-      setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+      setExistingImages((prev) =>
+        prev.filter((img) => img.id !== imageToDelete!.id)
+      );
       toast.success("Image removed.");
     } else {
       toast.error(result.error || "Failed to remove image.");
     }
+    setImageToDelete(null);
+    setShowQuestionImageDeleteDialog(false);
+  }
+
+  async function handleConfirmNewImageDelete() {
+    if (!newImageToDelete) return;
+
+    const result = await deleteImage(newImageToDelete);
+    if (result.success) {
+      setUploadedImages((prev) =>
+        prev.filter((img) => img.publicId !== newImageToDelete)
+      );
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+    setNewImageToDelete(null);
+    setShowNewImageDeleteDialog(false);
+  }
+
+  async function handleConfirmAnswerImageDelete() {
+    if (!answerImageToDelete) return;
+
+    const result = await deleteImage(answerImageToDelete.publicId);
+    if (result.success) {
+      const currentImages = form.getValues(
+        `answers.${answerImageToDelete.answerIndex}.images`
+      );
+      form.setValue(
+        `answers.${answerImageToDelete.answerIndex}.images`,
+        currentImages.filter(
+          (img) => img.publicId !== answerImageToDelete.publicId
+        )
+      );
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+    setAnswerImageToDelete(null);
+    setShowAnswerImageDeleteDialog(false);
+  }
+
+  async function handleConfirmExistingAnswerImageDelete() {
+    if (!existingAnswerImageToDelete) return;
+
+    const answerImages =
+      question.answers?.[existingAnswerImageToDelete.answerIndex]?.images;
+    const imageToRemove = answerImages?.find(
+      (img) => img.id === existingAnswerImageToDelete.imageId
+    );
+    if (!imageToRemove) return;
+
+    const result = await deleteImage(imageToRemove.publicId);
+    if (result.success) {
+      toast.success("Image removed.");
+    } else {
+      toast.error(result.error || "Failed to remove image.");
+    }
+    setExistingAnswerImageToDelete(null);
+    setShowExistingAnswerImageDeleteDialog(false);
   }
 
   function handleAnswerImageUpload(
@@ -139,35 +220,16 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
     answerIndex: number,
     publicIdToRemove: string
   ) {
-    const result = await deleteImage(publicIdToRemove);
-    if (result.success) {
-      const currentImages = form.getValues(`answers.${answerIndex}.images`);
-      form.setValue(
-        `answers.${answerIndex}.images`,
-        currentImages.filter((img) => img.publicId !== publicIdToRemove)
-      );
-      toast.success("Image removed.");
-    } else {
-      toast.error(result.error || "Failed to remove image.");
-    }
+    setAnswerImageToDelete({ publicId: publicIdToRemove, answerIndex });
+    setShowAnswerImageDeleteDialog(true);
   }
 
   async function handleRemoveExistingAnswerImage(
     answerIndex: number,
     imageId: string
   ) {
-    const answerImages = question.answers?.[answerIndex]?.images;
-    const imageToRemove = answerImages?.find((img) => img.id === imageId);
-    if (!imageToRemove) return;
-
-    const result = await deleteImage(imageToRemove.publicId);
-    if (result.success) {
-      // Note: This removes the image from the database immediately
-      // The UI will update when the page refreshes or component re-mounts
-      toast.success("Image removed.");
-    } else {
-      toast.error(result.error || "Failed to remove image.");
-    }
+    setExistingAnswerImageToDelete({ imageId, answerIndex });
+    setShowExistingAnswerImageDeleteDialog(true);
   }
 
   async function onSubmit(data: z.infer<typeof QuestionUpdateSchema>) {
@@ -502,15 +564,20 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                                   Existing Images:
                                 </div>
                                 {question.answers[index].images!.map((img) => (
-                                  <div key={img.id} className="relative w-full">
+                                  <div
+                                    key={img.id}
+                                    className="flex items-center space-x-3 p-2 border rounded-md"
+                                  >
                                     <Image
                                       src={img.url}
                                       alt="Existing answer"
-                                      width={0}
-                                      height={0}
-                                      sizes="100vw"
-                                      className="w-full h-auto rounded"
+                                      width={60}
+                                      height={60}
+                                      className="object-cover rounded border"
                                     />
+                                    <span className="text-sm text-muted-foreground flex-1 truncate">
+                                      {img.publicId.split("/").pop()}
+                                    </span>
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -519,10 +586,10 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                                           img.id
                                         )
                                       }
-                                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 opacity-80 hover:opacity-100 transition-opacity"
+                                      className="text-red-600 hover:text-red-800 transition-colors"
                                       disabled={isPending}
                                     >
-                                      <X className="w-3 h-3" />
+                                      <X className="w-4 h-4" />
                                     </button>
                                   </div>
                                 ))}
@@ -531,18 +598,22 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
 
                           {imagesField.value &&
                             imagesField.value.length > 0 && (
-                              <div className="mt-2 grid grid-cols-3 gap-2">
+                              <div className="mt-2 space-y-2">
                                 {imagesField.value.map((img) => (
                                   <div
                                     key={img.publicId}
-                                    className="relative group aspect-square"
+                                    className="flex items-center space-x-3 p-2 border rounded-md"
                                   >
                                     <Image
                                       src={img.url}
                                       alt="Answer"
-                                      fill
+                                      width={60}
+                                      height={60}
                                       className="object-cover rounded border"
                                     />
+                                    <span className="text-sm text-muted-foreground flex-1 truncate">
+                                      {img.publicId.split("/").pop()}
+                                    </span>
                                     <button
                                       type="button"
                                       onClick={() =>
@@ -551,10 +622,10 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                                           img.publicId
                                         )
                                       }
-                                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="text-red-600 hover:text-red-800 transition-colors"
                                       disabled={isPending}
                                     >
-                                      <X className="w-3 h-3" />
+                                      <X className="w-4 h-4" />
                                     </button>
                                   </div>
                                 ))}
@@ -605,6 +676,46 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
           </CardContent>
         </Card>
       </form>
+
+      <ConfirmDialog
+        open={showQuestionImageDeleteDialog}
+        onOpenChange={setShowQuestionImageDeleteDialog}
+        title="Delete Question Image"
+        description="Are you sure you want to delete this question image? This action cannot be undone."
+        onConfirm={handleConfirmQuestionImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showNewImageDeleteDialog}
+        onOpenChange={setShowNewImageDeleteDialog}
+        title="Delete New Image"
+        description="Are you sure you want to delete this newly uploaded image? This action cannot be undone."
+        onConfirm={handleConfirmNewImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showAnswerImageDeleteDialog}
+        onOpenChange={setShowAnswerImageDeleteDialog}
+        title="Delete Answer Image"
+        description="Are you sure you want to delete this answer image? This action cannot be undone."
+        onConfirm={handleConfirmAnswerImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={showExistingAnswerImageDeleteDialog}
+        onOpenChange={setShowExistingAnswerImageDeleteDialog}
+        title="Delete Answer Image"
+        description="Are you sure you want to delete this answer image? This action cannot be undone."
+        onConfirm={handleConfirmExistingAnswerImageDelete}
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }
