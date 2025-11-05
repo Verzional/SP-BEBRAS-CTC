@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Pencil, Trash } from "lucide-react";
 
 import { deletePost } from "@/services/post";
@@ -16,6 +18,7 @@ import {
   CardContent,
   CardAction,
 } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 
 interface PostDetailProps {
   post: Post;
@@ -23,64 +26,85 @@ interface PostDetailProps {
 
 export function PostDetail({ post }: PostDetailProps) {
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deletePost(post.id);
+      router.push("/admin/posts");
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+      toast.error("Failed to delete post");
+    }
+  };
 
   return (
-    <Card>
-      <CardHeader className="border-b">
-        <CardTitle>Post #{post.postNumber}</CardTitle>
-        <CardDescription>View and manage post details</CardDescription>
-        {/* Action Buttons */}
-        <CardAction>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon-sm" asChild>
-              <Link href={`/admin/posts/${post.id}/edit`}>
-                <Pencil />
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="icon-sm"
-              className="hover:cursor-pointer"
-              onClick={() => {
-                deletePost(post.id);
-                router.push("/admin/posts");
-              }}
-            >
-              <Trash />
-            </Button>
-          </div>
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Post Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold leading-none">
-              Post Information
-            </h3>
-            <div className="divide-y">
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  Post Number
-                </dt>
-                <dd className="text-sm">{post.postNumber}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  PIC Name
-                </dt>
-                <dd className="text-sm">{post.picName}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  Level
-                </dt>
-                <dd className="text-sm">{post.level}</dd>
+    <>
+      <Card>
+        <CardHeader className="border-b">
+          <CardTitle>Post #{post.postNumber}</CardTitle>
+          <CardDescription>View and manage post details</CardDescription>
+          {/* Action Buttons */}
+          <CardAction>
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon-sm" asChild>
+                <Link href={`/admin/posts/${post.id}/edit`}>
+                  <Pencil />
+                </Link>
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon-sm"
+                className="hover:cursor-pointer"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash />
+              </Button>
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Post Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold leading-none">
+                Post Information
+              </h3>
+              <div className="divide-y">
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    Post Number
+                  </dt>
+                  <dd className="text-sm">{post.postNumber}</dd>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    PIC Name
+                  </dt>
+                  <dd className="text-sm">{post.picName}</dd>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    Level
+                  </dt>
+                  <dd className="text-sm">{post.level}</dd>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete Post"
+        description={`Are you sure you want to delete post #${post.postNumber}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }

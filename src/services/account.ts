@@ -70,18 +70,13 @@ export async function updateAccount(
 }
 
 export async function deleteAccount(accountId: string) {
-  try {
-    const deleted = await prisma.account.delete({
-      where: { id: accountId },
-    });
+  const deleted = await prisma.account.delete({
+    where: { id: accountId },
+  });
 
-    revalidatePath("/admin/accounts");
+  revalidatePath("/admin/accounts");
 
-    return { success: true, deleted };
-  } catch (err) {
-    console.error("Failed to delete account:", err);
-    return { success: false, error: "Failed to delete account." };
-  }
+  return deleted;
 }
 
 export async function getAccountById(accountId: string) {

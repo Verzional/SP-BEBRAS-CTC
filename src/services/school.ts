@@ -60,16 +60,11 @@ export async function updateSchool(
 }
 
 export async function deleteSchool(schoolId: string) {
-  try {
-    const deleted = await prisma.school.delete({
-      where: { id: schoolId },
-    });
+  const deleted = await prisma.school.delete({
+    where: { id: schoolId },
+  });
 
-    revalidatePath("/admin/schools");
+  revalidatePath("/admin/schools");
 
-    return { success: true, deleted };
-  } catch (err) {
-    console.error("Failed to delete school:", err);
-    return { success: false, error: "Failed to delete school." };
-  }
+  return deleted;
 }

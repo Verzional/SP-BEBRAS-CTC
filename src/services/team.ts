@@ -180,18 +180,13 @@ export async function updateTeamWithMembers(
 }
 
 export async function deleteTeam(teamId: string) {
-  try {
-    const deleted = await prisma.team.delete({
-      where: { id: teamId },
-    });
+  const deleted = await prisma.team.delete({
+    where: { id: teamId },
+  });
 
-    revalidatePath("/admin/teams");
+  revalidatePath("/admin/teams");
 
-    return { success: true, deleted };
-  } catch (err) {
-    console.error("Failed to delete team:", err);
-    return { success: false, error: "Failed to delete team." };
-  }
+  return deleted;
 }
 
 export async function getTeamRank(teamId: string): Promise<number | null> {

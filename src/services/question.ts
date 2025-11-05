@@ -206,19 +206,14 @@ export async function updateQuestion(
 }
 
 export async function deleteQuestion(questionId: string) {
-  try {
-    const deleted = await prisma.question.delete({
-      where: { id: questionId },
-    });
+  const deleted = await prisma.question.delete({
+    where: { id: questionId },
+  });
 
-    revalidatePath("/admin/questions");
-    revalidatePath("/admin/answers/create");
+  revalidatePath("/admin/questions");
+  revalidatePath("/admin/answers/create");
 
-    return { success: true, deleted };
-  } catch (err) {
-    console.error("Failed to delete question:", err);
-    return { success: false, error: "Failed to delete question." };
-  }
+  return deleted;
 }
 
 async function getRandomUnsolvedQuestion(

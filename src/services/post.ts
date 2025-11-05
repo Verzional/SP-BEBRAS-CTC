@@ -60,15 +60,11 @@ export async function updatePost(
 }
 
 export async function deletePost(postId: string) {
-  try {
-    const deleted = await prisma.post.delete({
-      where: { id: postId },
-    });
+  const deleted = await prisma.post.delete({
+    where: { id: postId },
+  });
 
-    revalidatePath("/admin/posts");
+  revalidatePath("/admin/posts");
 
-    return { success: true, deleted };
-  } catch (err) {
-    return { error: "Failed to delete post: " + (err as Error).message };
-  }
+  return deleted;
 }

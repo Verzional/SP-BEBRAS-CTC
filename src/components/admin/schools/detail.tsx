@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteSchool } from "@/services/school";
@@ -16,6 +18,7 @@ import {
   CardContent,
   CardAction,
 } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 
 interface SchoolDetailProps {
   school: School;
@@ -23,79 +26,100 @@ interface SchoolDetailProps {
 
 export function SchoolDetail({ school }: SchoolDetailProps) {
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deleteSchool(school.id);
+      router.push("/admin/schools");
+    } catch (error) {
+      console.error("Failed to delete school:", error);
+      toast.error("Failed to delete school");
+    }
+  };
 
   return (
-    <Card>
-      <CardHeader className="border-b">
-        <CardTitle>{school.name}</CardTitle>
-        <CardDescription>View and manage school details</CardDescription>
-        {/* Action Buttons */}
-        <CardAction>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon-sm" asChild>
-              <Link href={`/admin/schools/${school.id}/edit`}>
-                <Pencil />
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="icon-sm"
-              className="hover:cursor-pointer"
-              onClick={() => {
-                deleteSchool(school.id);
-                router.push("/admin/schools");
-              }}
-            >
-              <Trash />
-            </Button>
-          </div>
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Basic Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold leading-none">
-              Basic Information
-            </h3>
-            <dl className="divide-y">
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  School Name
-                </dt>
-                <dd className="text-sm">{school.name}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  Address
-                </dt>
-                <dd className="text-sm">{school.address ?? "-"}</dd>
-              </div>
-            </dl>
-          </div>
+    <>
+      <Card>
+        <CardHeader className="border-b">
+          <CardTitle>{school.name}</CardTitle>
+          <CardDescription>View and manage school details</CardDescription>
+          {/* Action Buttons */}
+          <CardAction>
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon-sm" asChild>
+                <Link href={`/admin/schools/${school.id}/edit`}>
+                  <Pencil />
+                </Link>
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon-sm"
+                className="hover:cursor-pointer"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash />
+              </Button>
+            </div>
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Basic Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold leading-none">
+                Basic Information
+              </h3>
+              <dl className="divide-y">
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    School Name
+                  </dt>
+                  <dd className="text-sm">{school.name}</dd>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    Address
+                  </dt>
+                  <dd className="text-sm">{school.address ?? "-"}</dd>
+                </div>
+              </dl>
+            </div>
 
-          {/* Contact Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold leading-none">
-              Contact Information
-            </h3>
-            <dl className="divide-y">
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  PIC Name
-                </dt>
-                <dd className="text-sm">{school.picName ?? "-"}</dd>
-              </div>
-              <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
-                <dt className="text-muted-foreground text-sm font-medium">
-                  PIC Email
-                </dt>
-                <dd className="text-sm">{school.picEmail ?? "-"}</dd>
-              </div>
-            </dl>
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold leading-none">
+                Contact Information
+              </h3>
+              <dl className="divide-y">
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    PIC Name
+                  </dt>
+                  <dd className="text-sm">{school.picName ?? "-"}</dd>
+                </div>
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-2">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    PIC Email
+                  </dt>
+                  <dd className="text-sm">{school.picEmail ?? "-"}</dd>
+                </div>
+              </dl>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Delete School"
+        description={`Are you sure you want to delete the school "${school.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }
