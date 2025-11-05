@@ -1,15 +1,21 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getTeamById, getTeamRank } from "@/services/team";
 import { Dashboard } from "@/components/app/dashboard";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const session = await auth();
 
   if (!session?.user?.teamId) {
-    redirect("/auth/login");
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p>You are not assigned to a team yet. Please contact an administrator to assign you to a team.</p>
+        </div>
+      </div>
+    );
   }
 
   const team = await getTeamById(session.user.teamId);

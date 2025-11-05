@@ -57,7 +57,9 @@ const getMedalBgClass = (category: string) => {
 export function Dashboard({ team, rank }: DashboardProps) {
   const router = useRouter();
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
-  const [qrSize] = useState(() => Math.min(250, window.innerWidth * 0.6));
+  const [qrSize] = useState(() =>
+    typeof window !== "undefined" ? Math.min(250, window.innerWidth * 0.6) : 250
+  );
 
   const medalCategory = rank ? getMedalCategory(rank) : null;
 
@@ -130,7 +132,7 @@ export function Dashboard({ team, rank }: DashboardProps) {
               className="cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => setIsQRDialogOpen(true)}
             >
-              <QRCode team={team} size={200} />
+              <QRCode team={team} size={250} />
             </div>
             <p className="text-sm text-muted-foreground text-center">
               Click QR code to enlarge or show to admin to get questions

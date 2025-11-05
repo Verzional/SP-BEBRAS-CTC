@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Clock, CheckCircle, Play, Pause } from "lucide-react";
 import { pusherClient } from "@/lib/pusher";
 import { ContestStatus } from "@/generated/client/enums";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface HomeProps {
   status?: ContestStatus;
@@ -13,6 +15,7 @@ interface HomeProps {
 
 export function Home({ status = ContestStatus.PENDING }: HomeProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [currentStatus, setCurrentStatus] = useState(status);
 
   useEffect(() => {
@@ -112,6 +115,9 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
 
   const config = getStatusConfig();
 
+  const dashboardHref =
+    session?.user?.role === "USER" ? "/dashboard" : "/admin";
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
@@ -152,6 +158,15 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {config.description}
               </p>
+
+              {/* Dashboard Button */}
+              {session && (
+                <div className="flex justify-center">
+                  <Button asChild>
+                    <a href={dashboardHref}>Go to Dashboard</a>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

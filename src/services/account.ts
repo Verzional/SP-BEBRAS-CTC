@@ -90,3 +90,16 @@ export async function deleteAccount(accountId: string) {
     return { success: false, error: "Failed to delete account." };
   }
 }
+
+export async function getAccountById(accountId: string) {
+  return await prisma.account.findUnique({
+    where: { id: accountId },
+    include: {
+      team: {
+        include: {
+          school: true,
+        },
+      },
+    },
+  });
+}
