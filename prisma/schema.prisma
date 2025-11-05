@@ -127,7 +127,7 @@ model Answer {
 
   images Image[]
 
-  question Question @relation(fields: [questionId], references: [id])
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }
 
 model Submission {

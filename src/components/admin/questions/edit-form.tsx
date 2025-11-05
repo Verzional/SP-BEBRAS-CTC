@@ -11,7 +11,7 @@ import { Plus, Trash2, X } from "lucide-react";
 
 import { updateQuestion } from "@/services/question";
 import { saveImageMetadata, deleteImage } from "@/services/image";
-import { QuestionWithAnswersSchema } from "@/types/db/question";
+import { QuestionUpdateSchema } from "@/types/db/question";
 import {
   Question,
   Image as ImageType,
@@ -60,14 +60,15 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
     question.images || []
   );
 
-  const form = useForm<z.infer<typeof QuestionWithAnswersSchema>>({
-    resolver: zodResolver(QuestionWithAnswersSchema),
+  const form = useForm<z.infer<typeof QuestionUpdateSchema>>({
+    resolver: zodResolver(QuestionUpdateSchema),
     defaultValues: {
       title: question.title,
       level: question.level,
       difficulty: question.difficulty,
       questionImages: [],
       answers: (question.answers || []).map((answer) => ({
+        id: answer.id,
         content: answer.content || "",
         correct: answer.correct,
         images: [],
@@ -169,12 +170,10 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
     }
   }
 
-  function onSubmit(data: z.infer<typeof QuestionWithAnswersSchema>) {
+  async function onSubmit(data: z.infer<typeof QuestionUpdateSchema>) {
     startTransition(async () => {
       try {
-        // Extract question data from form data
-        const { title, level, difficulty } = data;
-        await updateQuestion(question.id, { title, level, difficulty });
+        await updateQuestion(question.id, data);
 
         let allImagesSaved = true;
         for (const img of uploadedImages) {

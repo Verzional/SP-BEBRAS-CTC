@@ -56,6 +56,7 @@ export async function updateAnswer(
       data: result.data,
     });
 
+    revalidatePath("/admin/questions");
     revalidatePath("/admin/answers");
 
     return { success: true, answer };
