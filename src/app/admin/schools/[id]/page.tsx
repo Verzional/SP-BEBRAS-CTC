@@ -3,6 +3,8 @@ import { getSchoolById } from "@/services/school";
 import { IDParams } from "@/types/id";
 import { SchoolDetail } from "@/components/admin/schools/detail";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SchoolDetailPage({
   params,
 }: IDParams) {

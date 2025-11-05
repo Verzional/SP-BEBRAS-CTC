@@ -3,6 +3,8 @@ import { auth } from "@/auth";
 import { getTeamById, getTeamRank } from "@/services/team";
 import { Dashboard } from "@/components/app/dashboard";
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const session = await auth();
 

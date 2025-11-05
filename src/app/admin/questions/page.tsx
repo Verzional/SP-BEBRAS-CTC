@@ -1,6 +1,8 @@
 import { getAllQuestions } from "@/services/question";
 import { QuestionList } from "@/components/admin/questions/list";
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuestionsPage() {
   const questions = await getAllQuestions();
 

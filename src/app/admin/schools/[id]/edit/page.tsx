@@ -3,6 +3,8 @@ import { getSchoolById } from "@/services/school";
 import { IDParams } from "@/types/id";
 import { SchoolEditForm } from "@/components/admin/schools/edit-form";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditSchoolPage({ params }: IDParams) {
   const { id } = await params;
   const school = await getSchoolById(id);

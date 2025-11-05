@@ -3,6 +3,8 @@ import { getQuestionById } from "@/services/question";
 import { IDParams } from "@/types/id";
 import { QuestionDetail } from "@/components/admin/questions/detail";
 
+export const dynamic = 'force-dynamic';
+
 export default async function QuestionDetailPage({
   params,
 }: IDParams) {

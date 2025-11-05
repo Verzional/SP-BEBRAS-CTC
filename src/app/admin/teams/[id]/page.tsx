@@ -3,6 +3,8 @@ import { getTeamById } from "@/services/team";
 import { IDParams } from "@/types/id";
 import { TeamDetail } from "@/components/admin/teams/detail";
 
+export const dynamic = 'force-dynamic';
+
 export default async function TeamDetailPage({ params }: IDParams) {
   const { id } = await params;
   const team = await getTeamById(id);
