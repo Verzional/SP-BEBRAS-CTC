@@ -41,7 +41,7 @@ ENV DATABASE_URL="postgresql://dummy:dummy@dummyhost:5432/dummy"
 
 # Install dependencies and generate Prisma client
 RUN pnpm install --offline
-RUN pnpm prisma generate
+RUN pnpm prisma generate --no-engine
 
 # Build Next.js app (The NEXT_PUBLIC values are now correctly baked in here)
 RUN pnpm build
