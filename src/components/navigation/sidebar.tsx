@@ -1,7 +1,6 @@
 import { AppSidebar } from "./app-sidebar";
 import { Breadcrumb } from "./breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import {
   SidebarInset,
   SidebarProvider,
@@ -11,7 +10,6 @@ import {
 export function Sidebar({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <ThemeToggle fixed />
       <AppSidebar />
       <SidebarInset className="flex flex-col">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

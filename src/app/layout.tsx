@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Toaster } from "@/components/layout/toaster";
 import { Background } from "@/components/layout/background";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { SessionProvider } from "@/components/layout/session-provider";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <SessionProvider>
           <ThemeProvider>
+            <ThemeToggle />
             <Background />
             {children}
             <Toaster />
