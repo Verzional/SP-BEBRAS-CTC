@@ -144,16 +144,6 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                           ))}
                         </div>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="bg-background"
-                        asChild
-                      >
-                        <Link href={`/admin/answers/${answer.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
                     </div>
                   </div>
                 ))}
