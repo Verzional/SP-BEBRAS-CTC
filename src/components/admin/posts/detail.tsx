@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 
 import { deletePost } from "@/services/post";
@@ -21,6 +22,8 @@ interface PostDetailProps {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader className="border-b">
@@ -38,7 +41,10 @@ export function PostDetail({ post }: PostDetailProps) {
               variant="destructive"
               size="icon-sm"
               className="hover:cursor-pointer"
-              onClick={() => deletePost(post.id)}
+              onClick={() => {
+                deletePost(post.id);
+                router.push("/admin/posts");
+              }}
             >
               <Trash />
             </Button>

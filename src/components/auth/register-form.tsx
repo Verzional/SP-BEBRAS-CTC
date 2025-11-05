@@ -71,13 +71,12 @@ export function AccountCreateForm({ teams = [] }: AccountCreateFormProps) {
 
   function onSubmit(data: z.infer<typeof AccountSchema>) {
     startTransition(async () => {
-      const result = await createAccount(data);
-
-      if (result.error) {
-        toast.error(result.error);
-      } else {
+      try {
+        await createAccount(data);
         toast.success("Account created successfully!");
         form.reset();
+      } catch (error) {
+        toast.error((error as Error).message);
       }
     });
   }

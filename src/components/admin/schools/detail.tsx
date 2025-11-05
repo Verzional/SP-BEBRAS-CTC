@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteSchool } from "@/services/school";
@@ -21,6 +22,8 @@ interface SchoolDetailProps {
 }
 
 export function SchoolDetail({ school }: SchoolDetailProps) {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader className="border-b">
@@ -38,7 +41,10 @@ export function SchoolDetail({ school }: SchoolDetailProps) {
               variant="destructive"
               size="icon-sm"
               className="hover:cursor-pointer"
-              onClick={() => deleteSchool(school.id)}
+              onClick={() => {
+                deleteSchool(school.id);
+                router.push("/admin/schools");
+              }}
             >
               <Trash />
             </Button>

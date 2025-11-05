@@ -20,34 +20,27 @@ export async function createAccount(data: AccountFormData) {
     throw new Error("Invalid account data submitted");
   }
 
-  try {
-    const existingAccount = await prisma.account.findUnique({
-      where: { username: result.data.username },
-    });
+  const existingAccount = await prisma.account.findUnique({
+    where: { username: result.data.username },
+  });
 
-    if (existingAccount) {
-      return {
-        error: "Username already exists. Please choose another one.",
-      };
-    }
-
-    const hashedPassword = hashSync(result.data.password, 10);
-
-    const account = await prisma.account.create({
-      data: {
-        username: result.data.username,
-        name: result.data.name,
-        password: hashedPassword,
-        role: result.data.role,
-      },
-    });
-
-    revalidatePath("/admin/accounts");
-
-    return { success: true, account };
-  } catch (err) {
-    return { error: "Failed to create account: " + (err as Error).message };
+  if (existingAccount) {
+    throw new Error("Username already exists. Please choose another one.");
   }
+
+  const account = await prisma.account.create({
+    data: {
+      username: result.data.username,
+      name: result.data.name,
+      password: hashSync(result.data.password, 10),
+      role: result.data.role,
+      teamId: result.data.teamId,
+    },
+  });
+
+  revalidatePath("/admin/accounts");
+
+  return account;
 }
 
 export async function updateAccount(

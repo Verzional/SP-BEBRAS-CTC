@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash } from "lucide-react";
 
 import { deleteAccount } from "@/services/account";
@@ -30,6 +31,8 @@ interface AccountDetailProps {
 }
 
 export function AccountDetail({ account }: AccountDetailProps) {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader className="border-b">
@@ -47,7 +50,10 @@ export function AccountDetail({ account }: AccountDetailProps) {
               variant="destructive"
               size="icon-sm"
               className="hover:cursor-pointer"
-              onClick={() => deleteAccount(account.id)}
+              onClick={() => {
+                deleteAccount(account.id);
+                router.push("/admin/accounts");
+              }}
             >
               <Trash />
             </Button>
