@@ -43,7 +43,6 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
           <TableHead>Title</TableHead>
           <TableHead>Level</TableHead>
           <TableHead>Difficulty</TableHead>
-          <TableHead>Images</TableHead>
           <TableHead>Answers</TableHead>
         </TableRow>
       </TableHeader>
@@ -64,7 +63,6 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
                 {difficultyLabels[question.difficulty]}
               </Badge>
             </TableCell>
-            <TableCell>{question.images?.length || 0}</TableCell>
             <TableCell>{question.answers?.length || 0}</TableCell>
           </TableRow>
         ))}

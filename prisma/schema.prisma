@@ -50,6 +50,7 @@ model Team {
   submissions Submission[]
 
   school School @relation(fields: [schoolId], references: [id])
+  post   Post?  @relation(fields: [postId], references: [id])
 }
 
 model Member {
@@ -80,6 +81,18 @@ model School {
 enum Level {
   SMP
   SMA
+}
+
+model Post {
+  id         String @id @default(cuid())
+  postNumber String
+  picName    String
+  level      Level
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  teams Team[]
 }
 
 // Question Models //
