@@ -28,7 +28,7 @@ export const QuestionWithAnswersSchema = z.object({
       publicId: z.string(),
     })
   ),
-      answers: z
+  answers: z
     .array(
       z.object({
         content: z.string().optional(),

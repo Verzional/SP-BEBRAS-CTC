@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import { FullQuestion } from "@/types/db/question";
 
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -45,18 +46,42 @@ const difficultyLabels = {
 export function QuestionList({ questions = [] }: QuestionListProps) {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const totalPages = Math.ceil(questions.length / ITEMS_PER_PAGE);
+  const filteredQuestions = useMemo(() => {
+    if (!searchTerm) return questions;
+    return questions.filter((question) =>
+      question.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [questions, searchTerm]);
+
+  const totalPages = Math.ceil(filteredQuestions.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedQuestions = questions.slice(startIndex, endIndex);
+  const paginatedQuestions = filteredQuestions.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   return (
     <>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search questions by title..."
+          value={searchTerm}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+
       <Table>
         <TableCaption>A list of questions in the database.</TableCaption>
         {/* Table Header */}
@@ -97,7 +122,11 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                className={
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
 
@@ -115,8 +144,14 @@ export function QuestionList({ questions = [] }: QuestionListProps) {
 
             <PaginationItem>
               <PaginationNext
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages, currentPage + 1))
+                }
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }
               />
             </PaginationItem>
           </PaginationContent>
