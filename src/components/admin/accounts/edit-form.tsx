@@ -62,7 +62,7 @@ const EditAccountSchema = z.object({
     .string()
     .min(1, "Name is required")
     .max(100, "Name must be less than 100 characters"),
-  role: z.enum(["USER", "ADMIN", "OPERATOR", "JUDGE"]),
+  role: z.enum(["USER", "ADMIN", "JUDGE"]),
   teamId: z.string().optional(),
 });
 
@@ -92,7 +92,7 @@ export function AccountEditForm({ account, teams = [] }: AccountEditFormProps) {
     defaultValues: {
       username: account.username,
       name: account.name,
-      role: account.role as "USER" | "ADMIN" | "OPERATOR" | "JUDGE",
+      role: account.role as "USER" | "ADMIN" | "JUDGE",
       teamId: account.teamId ?? undefined,
     },
   });
@@ -182,7 +182,6 @@ export function AccountEditForm({ account, teams = [] }: AccountEditFormProps) {
                     <SelectContent>
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="OPERATOR">Operator</SelectItem>
                       <SelectItem value="JUDGE">Judge</SelectItem>
                     </SelectContent>
                   </Select>

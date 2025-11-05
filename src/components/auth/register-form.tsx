@@ -180,7 +180,6 @@ export function AccountCreateForm({ teams = [] }: AccountCreateFormProps) {
                     <SelectContent>
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="OPERATOR">Operator</SelectItem>
                       <SelectItem value="JUDGE">Judge</SelectItem>
                     </SelectContent>
                   </Select>

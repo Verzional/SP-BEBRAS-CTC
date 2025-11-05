@@ -1,7 +1,11 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { TeamSchema, TeamWithMembersSchema, teamInclude } from "@/types/db/team";
+import {
+  TeamSchema,
+  TeamWithMembersSchema,
+  teamInclude,
+} from "@/types/db/team";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -21,6 +25,30 @@ export async function getTeamById(teamId: string) {
   return await prisma.team.findUnique({
     where: { id: teamId },
     include: { members: true, school: true },
+  });
+}
+
+export async function getTop5TeamsByScoreHS() {
+  return await prisma.team.findMany({
+    orderBy: {
+      score: "desc",
+    },
+    take: 5,
+    where: {
+      level: "SMA",
+    },
+  });
+}
+
+export async function getTop5TeamsByScoreMS() {
+  return await prisma.team.findMany({
+    orderBy: {
+      score: "desc",
+    },
+    take: 5,
+    where: {
+      level: "SMP",
+    },
   });
 }
 
@@ -51,7 +79,9 @@ export async function createTeamWithMembers(
 
   if (!result.success) {
     return {
-      error: "Invalid team data: " + result.error.issues.map((e) => e.message).join(", ")
+      error:
+        "Invalid team data: " +
+        result.error.issues.map((e) => e.message).join(", "),
     };
   }
 
@@ -72,7 +102,7 @@ export async function createTeamWithMembers(
       // Create members for the team
       if (members.length > 0) {
         await tx.member.createMany({
-          data: members.map(member => ({
+          data: members.map((member) => ({
             name: member.name,
             teamId: newTeam.id,
           })),
@@ -93,7 +123,7 @@ export async function createTeamWithMembers(
   } catch (err) {
     console.error("Failed to create team with members:", err);
     return {
-      error: "Failed to create team: " + (err as Error).message
+      error: "Failed to create team: " + (err as Error).message,
     };
   }
 }
@@ -126,7 +156,9 @@ export async function updateTeamWithMembers(
 
   if (!result.success) {
     return {
-      error: "Invalid team data: " + result.error.issues.map((e) => e.message).join(", ")
+      error:
+        "Invalid team data: " +
+        result.error.issues.map((e) => e.message).join(", "),
     };
   }
 
@@ -153,7 +185,7 @@ export async function updateTeamWithMembers(
       // Create new members
       if (members.length > 0) {
         await tx.member.createMany({
-          data: members.map(member => ({
+          data: members.map((member) => ({
             name: member.name,
             teamId,
           })),
@@ -174,7 +206,7 @@ export async function updateTeamWithMembers(
   } catch (err) {
     console.error("Failed to update team with members:", err);
     return {
-      error: "Failed to update team: " + (err as Error).message
+      error: "Failed to update team: " + (err as Error).message,
     };
   }
 }

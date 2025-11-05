@@ -14,7 +14,6 @@ datasource db {
 enum Role {
   USER
   ADMIN
-  OPERATOR
   JUDGE
   MASTER
 }
@@ -31,7 +30,9 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team Team? @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  finalScores FinalScore[]
+
+  team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 }
 
 model Team {
@@ -48,6 +49,7 @@ model Team {
   account     Account?
   members     Member[]
   submissions Submission[]
+  finalScores FinalScore[]
 
   school School @relation(fields: [schoolId], references: [id])
   post   Post?  @relation(fields: [postId], references: [id])
@@ -138,8 +140,8 @@ model Submission {
 
   createdAt DateTime @default(now())
 
-  team     Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
-  question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, questionId])
 }
@@ -180,4 +182,30 @@ model Contest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Final Scoring Models //
+model Round {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  finalScores FinalScore[]
+}
+
+model FinalScore {
+  id      String @id @default(cuid())
+  judgeId String
+  teamId  String
+  roundId String
+  score   Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  judge Account @relation(fields: [judgeId], references: [id], onDelete: Restrict)
+  team  Team    @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  round Round   @relation(fields: [roundId], references: [id], onDelete: Restrict)
 }
