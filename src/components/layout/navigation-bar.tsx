@@ -4,7 +4,7 @@ import { ThemeToggle } from "./theme-toggle";
 
 export function NavigationBar() {
   return (
-    <nav className="flex justify-between items-center px-4 sm:px-8 bg-primary border-b border-border">
+    <nav className="flex justify-between items-center px-4 sm:px-8 bg-top-bar-primary border-b border-border">
       <div className="shrink-0">
         <Image
           src="/Logo.webp"

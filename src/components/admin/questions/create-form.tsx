@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { Controller, useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 import { createQuestion } from "@/services/question";
 import { deleteImage } from "@/services/image";
@@ -328,10 +328,10 @@ export function QuestionCreateForm() {
                               setImageToDelete(img.publicId);
                               setShowQuestionImageDeleteDialog(true);
                             }}
-                            className="text-red-600 hover:text-red-800 transition-colors"
+                            className="text-red-600 hover:text-red-800 transition-colors text-sm font-medium px-2 py-1"
                             disabled={isPending}
                           >
-                            <X className="w-4 h-4" />
+                            Remove
                           </button>
                         </div>
                       ))}
@@ -466,10 +466,10 @@ export function QuestionCreateForm() {
                                           img.publicId
                                         )
                                       }
-                                      className="text-red-600 hover:text-red-800 transition-colors"
+                                      className="text-red-600 hover:text-red-800 transition-colors text-sm font-medium px-2 py-1"
                                       disabled={isPending}
                                     >
-                                      <X className="w-4 h-4" />
+                                      Remove
                                     </button>
                                   </div>
                                 ))}
