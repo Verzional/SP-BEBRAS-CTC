@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { CheckCircle, XCircle } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { checkTeamSubmission } from "@/services/question";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,20 +44,6 @@ export function Question({ question, teamId }: QuestionProps) {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<{
-    success?: boolean;
-    correct?: boolean;
-    error?: string;
-  } | null>(null);
-
-  useEffect(() => {
-    if (result) {
-      const timer = setTimeout(() => {
-        router.push("/dashboard");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [result, router]);
 
   const handleSubmit = async () => {
     if (!selectedAnswerId) return;
@@ -69,56 +55,39 @@ export function Question({ question, teamId }: QuestionProps) {
         question.id,
         selectedAnswerId
       );
-      setResult(response);
+
+      if (response.success) {
+        if (response.correct) {
+          toast.success("Correct! +points", {
+            description: "Redirecting to dashboard...",
+          });
+        } else {
+          toast.error("Incorrect -points", {
+            description: "Redirecting to dashboard...",
+          });
+        }
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+      } else {
+        toast.error(response.error || "Failed to submit answer", {
+          description: "Redirecting to dashboard...",
+        });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+      }
     } catch {
-      setResult({ error: "Failed to submit answer" });
+      toast.error("Failed to submit answer", {
+        description: "Redirecting to dashboard...",
+      });
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (result) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card className="gap-4">
-          <CardHeader>
-            <CardTitle>Result</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {result.success ? (
-              <div className="flex flex-col items-center gap-4 py-8">
-                {result.correct ? (
-                  <CheckCircle className="w-16 h-16 text-green-500" />
-                ) : (
-                  <XCircle className="w-16 h-16 text-red-500" />
-                )}
-                <div
-                  className={`text-2xl font-bold text-center ${
-                    result.correct ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {result.correct ? "Correct! +points" : "Incorrect -points"}
-                </div>
-                <p className="text-muted-foreground text-center">
-                  Redirecting to dashboard in 2 seconds...
-                </p>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <div className="text-destructive text-xl font-semibold">
-                  {result.error}
-                </div>
-                <p className="text-muted-foreground mt-4">
-                  Redirecting to dashboard in 2 seconds...
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-2xl mx-auto p-6">

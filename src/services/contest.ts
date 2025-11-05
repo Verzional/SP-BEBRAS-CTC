@@ -53,9 +53,8 @@ export async function startContest(formData: FormData) {
   );
 
   const teams = await prisma.team.findMany({ select: { id: true } });
-  for (const team of teams) {
-    await getQuestionForTeam(team.id);
-  }
+
+  await Promise.all(teams.map((team) => getQuestionForTeam(team.id)));
 
   revalidatePath("/admin");
 }
@@ -230,6 +229,38 @@ export async function endContest() {
   const updatedContest = await prisma.contest.update({
     where: { id: contest.id },
     data: { status: ContestStatus.FINISHED, endTime: new Date() },
+  });
+
+  await pusherServer.trigger(
+    "contest-channel",
+    "status-update",
+    updatedContest
+  );
+  revalidatePath("/admin");
+}
+
+export async function setPendingContest() {
+  const session = await auth();
+
+  if (session?.user?.role !== "ADMIN" && session?.user?.role !== "MASTER") {
+    throw new Error("Unauthorized");
+  }
+
+  const contest = await getActiveContest();
+
+  if (contest.status === ContestStatus.PENDING) {
+    throw new Error("Contest is already pending.");
+  }
+
+  const updatedContest = await prisma.contest.update({
+    where: { id: contest.id },
+    data: {
+      status: ContestStatus.PENDING,
+      pausedTime: null,
+      totalPausedDuration: 0,
+      statusBeforePause: null,
+      frozenLeaderboard: Prisma.JsonNull,
+    },
   });
 
   await pusherServer.trigger(

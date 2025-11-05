@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { getTeamById, getTeamRank } from "@/services/team";
 import { Dashboard } from "@/components/app/dashboard";
+import { ContestGuard } from "@/components/layout/contest-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,10 @@ export default async function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-          <p>You are not assigned to a team yet. Please contact an administrator to assign you to a team.</p>
+          <p>
+            You are not assigned to a team yet. Please contact an administrator
+            to assign you to a team.
+          </p>
         </div>
       </div>
     );
@@ -28,6 +32,7 @@ export default async function DashboardPage() {
 
   return (
     <>
+      <ContestGuard />
       <Dashboard team={team} rank={rank ?? undefined} />
     </>
   );

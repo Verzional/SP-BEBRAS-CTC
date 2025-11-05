@@ -2,7 +2,15 @@
 
 import useSWR from "swr";
 import { useState, useEffect } from "react";
-import { Play, Pause, Square, Snowflake, Zap, Loader2 } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Square,
+  Snowflake,
+  Zap,
+  Loader2,
+  RotateCcw,
+} from "lucide-react";
 import { pusherClient } from "@/lib/pusher";
 import { Contest } from "@/generated/client/client";
 import { ContestStatus } from "@/generated/client/enums";
@@ -18,9 +26,17 @@ import {
   freezeContest,
   unfreezeContest,
   endContest,
+  setPendingContest,
 } from "@/services/contest";
 
-type Action = "start" | "pause" | "resume" | "freeze" | "unfreeze" | "end";
+type Action =
+  | "start"
+  | "pause"
+  | "resume"
+  | "freeze"
+  | "unfreeze"
+  | "end"
+  | "setPending";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -77,6 +93,9 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
           break;
         case "end":
           await endContest();
+          break;
+        case "setPending":
+          await setPendingContest();
           break;
       }
     } catch (err) {
@@ -209,19 +228,46 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       );
     }
 
-    buttons.push(
-      <Button
-        key="end"
-        onClick={() => handleAction("end")}
-        disabled={isLoading !== null}
-        variant="destructive"
-        className="flex-1"
-        size="lg"
-      >
-        <Square className="h-4 w-4 mr-2" />
-        End
-      </Button>
-    );
+    // End button (not shown when pending)
+    if (status !== ContestStatus.PENDING) {
+      buttons.push(
+        <Button
+          key="end"
+          onClick={() => handleAction("end")}
+          disabled={isLoading !== null}
+          variant="destructive"
+          className="flex-1"
+          size="lg"
+        >
+          {isLoading === "end" ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <Square className="h-4 w-4 mr-2" />
+          )}
+          End
+        </Button>
+      );
+    }
+
+    if (status === ContestStatus.FINISHED) {
+      buttons.push(
+        <Button
+          key="setPending"
+          onClick={() => handleAction("setPending")}
+          disabled={isLoading !== null}
+          variant="outline"
+          className="flex-1"
+          size="lg"
+        >
+          {isLoading === "setPending" ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          ) : (
+            <RotateCcw className="h-4 w-4 mr-2" />
+          )}
+          Reset to Pending
+        </Button>
+      );
+    }
 
     return buttons;
   };

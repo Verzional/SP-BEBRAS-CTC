@@ -40,8 +40,7 @@ export async function createQuestion(
   }
 
   try {
-    const { title, level, difficulty, questionImages, answers } =
-      result.data;
+    const { title, level, difficulty, questionImages, answers } = result.data;
 
     const question = await prisma.$transaction(async (tx) => {
       const newQuestion = await tx.question.create({
@@ -137,7 +136,11 @@ export async function deleteQuestion(questionId: string) {
   }
 }
 
-async function getRandomUnsolvedQuestion(teamId: string) {
+async function getRandomUnsolvedQuestion(
+  teamId: string,
+  level?: "SMP" | "SMA",
+  difficulty?: "EASY" | "MEDIUM" | "HARD"
+) {
   const submissions = await prisma.submission.findMany({
     where: { teamId: teamId },
     select: { questionId: true },
@@ -145,9 +148,21 @@ async function getRandomUnsolvedQuestion(teamId: string) {
 
   const solvedQuestionIds = submissions.map((q) => q.questionId);
 
-  const whereClause = {
+  const whereClause: {
+    id: { notIn: string[] };
+    level?: "SMP" | "SMA";
+    difficulty?: "EASY" | "MEDIUM" | "HARD";
+  } = {
     id: { notIn: solvedQuestionIds },
   };
+
+  if (level) {
+    whereClause.level = level;
+  }
+
+  if (difficulty) {
+    whereClause.difficulty = difficulty;
+  }
 
   const unsolvedQuestionCount = await prisma.question.count({
     where: whereClause,
@@ -170,7 +185,11 @@ async function getRandomUnsolvedQuestion(teamId: string) {
   return randomQuestion;
 }
 
-export async function getQuestionForTeam(teamId: string) {
+export async function getQuestionForTeam(
+  teamId: string,
+  level?: "SMP" | "SMA",
+  difficulty?: "EASY" | "MEDIUM" | "HARD"
+) {
   try {
     const team = await prisma.team.findUnique({ where: { id: teamId } });
 
@@ -178,7 +197,7 @@ export async function getQuestionForTeam(teamId: string) {
       return { error: "Invalid QR Code: Team not found." };
     }
 
-    const question = await getRandomUnsolvedQuestion(teamId);
+    const question = await getRandomUnsolvedQuestion(teamId, level, difficulty);
 
     if (!question) {
       return { error: "This team has already solved all available questions!" };
@@ -260,18 +279,28 @@ export async function checkTeamSubmission(
   }
 }
 
-export async function hasTeamAnswered(teamId: string, questionId: string) {
+export async function hasTeamRecentlyAnswered(teamId: string, questionId: string, maxAgeMs: number = 10000) {
   try {
-    const submission = await prisma.submission.findFirst({
+    const recentSubmission = await prisma.submission.findFirst({
       where: {
         teamId: teamId,
         questionId: questionId,
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
 
-    return { hasAnswered: !!submission };
+    if (!recentSubmission) {
+      return { hasAnswered: false, isRecent: false };
+    }
+
+    const timeSinceSubmission = new Date().getTime() - recentSubmission.createdAt.getTime();
+    const isRecent = timeSinceSubmission < maxAgeMs;
+
+    return { hasAnswered: true, isRecent };
   } catch (err) {
-    console.error("Error checking if team has answered: ", err);
+    console.error("Error checking if team has recently answered: ", err);
     return { error: "An unexpected server error occurred." };
   }
 }

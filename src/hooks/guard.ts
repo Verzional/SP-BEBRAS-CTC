@@ -49,12 +49,17 @@ export function useContestGuard() {
   }, [mutate]);
 
   useEffect(() => {
-    if (!session || !contestStatus || session.user?.role === Role.ADMIN || session.user?.role === Role.MASTER || pathname === "/") {
+    if (
+      !session ||
+      !contestStatus ||
+      session.user?.role === Role.ADMIN ||
+      session.user?.role === Role.MASTER ||
+      pathname === "/"
+    ) {
       return;
     }
 
     const shouldRedirectToHome =
-      contestStatus.status === ContestStatus.PENDING ||
       contestStatus.status === ContestStatus.FINISHED ||
       contestStatus.status === ContestStatus.PAUSED;
 

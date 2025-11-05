@@ -25,12 +25,6 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
         const data = await response.json();
         if (data.status) {
           setCurrentStatus(data.status);
-          if (
-            data.status === ContestStatus.RUNNING ||
-            data.status === ContestStatus.FROZEN
-          ) {
-            router.push("/dashboard");
-          }
         }
       } catch (error) {
         console.error("Failed to fetch contest status:", error);
@@ -41,12 +35,6 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
 
     channel.bind("status-update", (data: { status: ContestStatus }) => {
       setCurrentStatus(data.status);
-      if (
-        data.status === ContestStatus.RUNNING ||
-        data.status === ContestStatus.FROZEN
-      ) {
-        router.push("/dashboard");
-      }
     });
 
     fetchStatus();
@@ -55,6 +43,20 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
       pusherClient.unsubscribe("contest-channel");
     };
   }, [router]);
+
+  useEffect(() => {
+    if (!session?.user?.teamId) return;
+
+    const teamChannel = pusherClient.subscribe(`team-${session.user.teamId}`);
+
+    teamChannel.bind("question-assigned", (data: { questionId: string }) => {
+      router.push(`/question/${data.questionId}`);
+    });
+
+    return () => {
+      pusherClient.unsubscribe(`team-${session.user.teamId}`);
+    };
+  }, [session?.user?.teamId, router]);
 
   const isPending = currentStatus === ContestStatus.PENDING;
   const isPaused = currentStatus === ContestStatus.PAUSED;
