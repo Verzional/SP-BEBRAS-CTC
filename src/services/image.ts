@@ -6,7 +6,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { Prisma } from "@/generated/client/client";
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
@@ -86,8 +86,12 @@ export async function deleteImage(
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Failed to delete image:", error);
+
+    if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2025') {
+      return { success: true };
+    }
 
     return { success: false, error: "Failed to delete image." };
   }

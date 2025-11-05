@@ -2,8 +2,6 @@ import { getActiveContest } from "@/services/contest";
 import { ContestStatus } from "@/generated/client/enums";
 import { Home } from "@/components/app/home";
 
-export const dynamic = 'force-dynamic';
-
 export default async function HomePage() {
   const contest = await getActiveContest();
   const status = contest?.status ?? ContestStatus.PENDING;

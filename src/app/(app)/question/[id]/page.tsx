@@ -6,8 +6,6 @@ import { Question } from "@/components/app/question";
 import { ContestGuard } from "@/components/layout/contest-guard";
 import { Role } from "@/generated/client/enums";
 
-export const dynamic = "force-dynamic";
-
 export default async function QuestionPage({ params }: IDParams) {
   const session = await auth();
   const { id } = await params;

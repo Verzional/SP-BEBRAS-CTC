@@ -3,8 +3,6 @@ import { getTeamById, getTeamRank } from "@/services/team";
 import { Dashboard } from "@/components/app/dashboard";
 import { ContestGuard } from "@/components/layout/contest-guard";
 
-export const dynamic = "force-dynamic";
-
 export default async function DashboardPage() {
   const session = await auth();
 
