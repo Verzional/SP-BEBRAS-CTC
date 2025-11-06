@@ -53,6 +53,7 @@ export async function createTeam(data: z.infer<typeof TeamSchema>) {
     });
 
     revalidatePath("/admin/teams");
+    revalidatePath("/admin/accounts");
 
     return { success: true, team };
   } catch (err) {
@@ -158,6 +159,7 @@ export async function updateTeamWithMembers(
     });
 
     revalidatePath("/admin/teams");
+    revalidatePath("/admin/accounts");
 
     return { success: true, team };
   } catch (err) {
