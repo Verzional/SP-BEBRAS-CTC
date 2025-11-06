@@ -45,6 +45,9 @@ export function QRScanner() {
       setError(null);
       const teamId = detectedCodes[0].rawValue;
 
+      console.log("QR Scanner - Scanning team:", teamId);
+      console.log("QR Scanner - Current filters - Level:", level, "Difficulty:", difficulty);
+
       const response = await getQuestionForTeam(teamId, level, difficulty);
 
       if (response.error) {

@@ -214,12 +214,15 @@ async function getRandomUnsolvedQuestion(
   level?: "SMP" | "SMA",
   difficulty?: "EASY" | "MEDIUM" | "HARD"
 ) {
+  console.log("getRandomUnsolvedQuestion called with:", { teamId, level, difficulty });
+
   const submissions = await prisma.submission.findMany({
     where: { teamId: teamId },
     select: { questionId: true },
   });
 
   const solvedQuestionIds = submissions.map((q) => q.questionId);
+  console.log("Solved question IDs:", solvedQuestionIds);
 
   const whereClause: {
     id: { notIn: string[] };
@@ -239,9 +242,13 @@ async function getRandomUnsolvedQuestion(
     whereClause.difficulty = difficulty;
   }
 
+  console.log("Final whereClause:", whereClause);
+
   const unsolvedQuestionCount = await prisma.question.count({
     where: whereClause,
   });
+
+  console.log("Unsolved question count:", unsolvedQuestionCount);
 
   if (unsolvedQuestionCount === 0) {
     return null;
@@ -257,6 +264,13 @@ async function getRandomUnsolvedQuestion(
     },
   });
 
+  console.log("Selected question:", {
+    id: randomQuestion?.id,
+    level: randomQuestion?.level,
+    difficulty: randomQuestion?.difficulty,
+    title: randomQuestion?.title
+  });
+
   return randomQuestion;
 }
 
@@ -266,6 +280,8 @@ export async function getQuestionForTeam(
   difficulty?: "EASY" | "MEDIUM" | "HARD"
 ) {
   try {
+    console.log("getQuestionForTeam called with:", { teamId, level, difficulty });
+    
     const team = await prisma.team.findUnique({ where: { id: teamId } });
 
     if (!team) {
