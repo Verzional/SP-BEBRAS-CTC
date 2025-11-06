@@ -344,7 +344,7 @@ export async function checkTeamSubmission(
       data: { score: team.score },
     });
 
-    revalidatePath("/leaderboard");
+    revalidatePath("/master/leaderboard");
     revalidatePath("/dashboard");
 
     return { success: true, correct };
