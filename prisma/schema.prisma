@@ -103,11 +103,17 @@ enum Difficulty {
   HARD
 }
 
+enum RoundType {
+  PRELIMINARY
+  FINAL
+}
+
 model Question {
   id         String     @id @default(cuid())
   title      String
   level      Level
   difficulty Difficulty
+  roundType  RoundType @default(PRELIMINARY)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

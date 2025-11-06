@@ -89,6 +89,14 @@ export function QuestionDetail({ question }: QuestionDetailProps) {
                     </Badge>
                   </dd>
                 </div>
+                <div className="grid grid-cols-[120px_1fr] gap-4 py-4">
+                  <dt className="text-muted-foreground text-sm font-medium">
+                    Round Type
+                  </dt>
+                  <dd className="text-sm">
+                    <Badge>{question.roundType}</Badge>
+                  </dd>
+                </div>
               </dl>
             </div>
 

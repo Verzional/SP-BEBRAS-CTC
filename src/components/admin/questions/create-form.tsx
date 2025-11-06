@@ -297,6 +297,38 @@ export function QuestionCreateForm() {
                   )}
                 />
 
+                {/* Round Type */}
+                <Controller
+                  name="roundType"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-question-roundType">
+                        Round Type
+                      </FieldLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isPending}
+                      >
+                        <SelectTrigger
+                          id="form-question-roundType"
+                          className="w-full"
+                        >
+                          <SelectValue placeholder="Select round type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PRELIMINARY">Preliminary</SelectItem>
+                          <SelectItem value="FINAL">Final</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
                 {/* Question Images */}
                 <Field>
                   <FieldLabel>Question Images (Optional)</FieldLabel>

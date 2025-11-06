@@ -1,20 +1,8 @@
 import z from "zod";
 import { Prisma } from "@/generated/client/client";
-import { Difficulty, Level } from "@/generated/client/enums";
+import { Difficulty, Level, RoundType } from "@/generated/client/enums";
 
-// SCHEMA //
-export const QuestionSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Title is required")
-    .max(255, "Title must be less than 255 characters"),
-  level: z.enum(Level, "Level is required and must be valid"),
-  difficulty: z.enum(Difficulty, "Difficulty is required and must be valid"),
-});
-
-export type Question = z.infer<typeof QuestionSchema>;
-
-// EXTENDED SCHEMA //
+// CREATE SCHEMA //
 export const QuestionWithAnswersSchema = z.object({
   title: z
     .string()
@@ -22,6 +10,7 @@ export const QuestionWithAnswersSchema = z.object({
     .max(255, "Title must be less than 255 characters"),
   level: z.enum(Level, "Level is required and must be valid"),
   difficulty: z.enum(Difficulty, "Difficulty is required and must be valid"),
+  roundType: z.enum(RoundType, "Round Type is required and must be valid"),
   questionImages: z.array(
     z.object({
       url: z.string(),
@@ -58,6 +47,7 @@ export const QuestionUpdateSchema = z.object({
     .max(255, "Title must be less than 255 characters"),
   level: z.enum(Level, "Level is required and must be valid"),
   difficulty: z.enum(Difficulty, "Difficulty is required and must be valid"),
+  roundType: z.enum(RoundType, "Round Type is required and must be valid"),
   questionImages: z.array(
     z.object({
       url: z.string(),
