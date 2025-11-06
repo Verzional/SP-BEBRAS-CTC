@@ -91,7 +91,10 @@ export function FinalScoringForm({ rounds, top5Teams }: FinalScoringFormProps) {
       } else {
         toast.success("Final scores submitted successfully!");
         const levelTeams = top5Teams[selectedLevel] || [];
-        const resetScores = levelTeams.map((team) => ({ teamId: team.id, score: 0 }));
+        const resetScores = levelTeams.map((team) => ({
+          teamId: team.id,
+          score: 0,
+        }));
         replace(resetScores);
       }
     });
@@ -213,8 +216,8 @@ export function FinalScoringForm({ rounds, top5Teams }: FinalScoringFormProps) {
                         </Label>
                         <Input
                           type="number"
-                          min="0"
-                          max="100"
+                          min="-10"
+                          max="10"
                           className="mt-1"
                           value={
                             watchedScores?.[index]?.score?.toString() ?? ""
