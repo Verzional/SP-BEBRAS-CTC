@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -24,7 +24,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { getTopTeamScoresByLevel } from "@/services/final";
 
 interface ScoreEntry {
   round: string;
@@ -40,18 +39,16 @@ interface TeamScore {
   totalScore: number;
 }
 
-export function TeamScores() {
-  const [selectedLevel, setSelectedLevel] = useState<"SMP" | "SMA">("SMP");
-  const [teamScores, setTeamScores] = useState<TeamScore[]>([]);
-  const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
-  const [isPending, startTransition] = useTransition();
+interface TeamScoresProps {
+  smpScores: TeamScore[];
+  smaScores: TeamScore[];
+}
 
-  useEffect(() => {
-    startTransition(async () => {
-      const data = await getTopTeamScoresByLevel(selectedLevel);
-      setTeamScores(data);
-    });
-  }, [selectedLevel]);
+export function TeamScores({ smpScores, smaScores }: TeamScoresProps) {
+  const [selectedLevel, setSelectedLevel] = useState<"SMP" | "SMA">("SMP");
+  const [expandedTeams, setExpandedTeams] = useState<Set<string>>(new Set());
+
+  const teamScores = selectedLevel === "SMP" ? smpScores : smaScores;
 
   const toggleTeam = (teamId: string) => {
     const newExpanded = new Set(expandedTeams);
@@ -86,64 +83,56 @@ export function TeamScores() {
         </div>
       </div>
 
-      {isPending ? (
-        <div className="text-center py-8">Loading...</div>
-      ) : (
-        teamScores.map((team) => (
-          <div key={team.teamId} className="border rounded-lg p-4">
-            <Collapsible>
-              <CollapsibleTrigger
-                onClick={() => toggleTeam(team.teamId)}
-                className="flex items-center justify-between w-full text-left"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    {expandedTeams.has(team.teamId) ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                    <h2 className="text-lg font-semibold">{team.teamName}</h2>
-                  </div>
-                  <Badge variant="secondary">{team.level}</Badge>
+      {teamScores.map((team) => (
+        <div key={team.teamId} className="border rounded-lg p-4">
+          <Collapsible>
+            <CollapsibleTrigger
+              onClick={() => toggleTeam(team.teamId)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  {expandedTeams.has(team.teamId) ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                  <h2 className="text-lg font-semibold">{team.teamName}</h2>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-muted-foreground">
-                    Total Score
-                  </div>
-                  <div className="text-xl font-bold">{team.totalScore}</div>
-                </div>
-              </CollapsibleTrigger>
+                <Badge variant="secondary">{team.level}</Badge>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-muted-foreground">Total Score</div>
+                <div className="text-xl font-bold">{team.totalScore}</div>
+              </div>
+            </CollapsibleTrigger>
 
-              <CollapsibleContent>
-                <Table className="mt-4">
-                  <TableCaption>
-                    Score breakdown for {team.teamName}
-                  </TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Round</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Judge</TableHead>
+            <CollapsibleContent>
+              <Table className="mt-4">
+                <TableCaption>Score breakdown for {team.teamName}</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Round</TableHead>
+                    <TableHead>Score</TableHead>
+                    <TableHead>Judge</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {team.scores.map((score, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">
+                        {score.round}
+                      </TableCell>
+                      <TableCell>{score.score}</TableCell>
+                      <TableCell>{score.judge}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {team.scores.map((score, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">
-                          {score.round}
-                        </TableCell>
-                        <TableCell>{score.score}</TableCell>
-                        <TableCell>{score.judge}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-        ))
-      )}
+                  ))}
+                </TableBody>
+              </Table>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      ))}
     </div>
   );
 }
