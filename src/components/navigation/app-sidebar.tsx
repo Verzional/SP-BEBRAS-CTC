@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import {
   House,
   ScanLine,
-  Timer,
   Trophy,
   Gavel,
   SignpostBig,
@@ -40,12 +39,6 @@ const data = {
       isCollapsible: false,
     },
     {
-      title: "Contest",
-      url: "/admin/contest",
-      icon: Timer,
-      isCollapsible: false,
-    },
-    {
       title: "Master",
       url: "#",
       icon: Trophy,
@@ -57,6 +50,10 @@ const data = {
         {
           title: "Leaderboard",
           url: "/master/leaderboard",
+        },
+        {
+          title: "Contest",
+          url: "/master/contest",
         },
         {
           title: "Create Account",
