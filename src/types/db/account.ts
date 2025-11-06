@@ -18,7 +18,7 @@ export const AccountSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(100, "Password must be less than 100 characters"),
-  role: z.enum(["USER", "ADMIN"]),
+  role: z.enum(["USER", "ADMIN", "MASTER"]),
   teamId: z.string().optional(),
 });
 

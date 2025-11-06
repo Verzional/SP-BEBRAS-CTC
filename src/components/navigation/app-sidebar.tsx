@@ -58,6 +58,10 @@ const data = {
           title: "Leaderboard",
           url: "/master/leaderboard",
         },
+        {
+          title: "Create Account",
+          url: "/master/create",
+        },
       ],
     },
     {
