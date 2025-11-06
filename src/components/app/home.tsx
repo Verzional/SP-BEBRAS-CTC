@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Clock, CheckCircle, Play, Pause } from "lucide-react";
 import { pusherClient } from "@/lib/pusher";
 import { ContestStatus } from "@/generated/client/enums";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface HomeProps {
@@ -68,9 +67,7 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
         icon: <Clock className="h-20 w-20 animate-pulse" />,
         title: "Contest Starting Soon",
         subtitle: "Get ready for the competition!",
-        description:
-          "The Bebras Challenge is about to begin. Please wait for the administrator to start the contest.",
-        badge: { text: "WAITING", variant: "secondary" as const },
+        subheader: "Please wait for the administrator to start the contest.",
         gradient:
           "from-blue-50 to-indigo-100 dark:from-blue-950/20 dark:to-indigo-900/20",
         iconColor: "text-blue-600 dark:text-blue-400",
@@ -81,9 +78,7 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
         icon: <Pause className="h-20 w-20" />,
         title: "Contest Paused",
         subtitle: "Competition temporarily halted",
-        description:
-          "The contest has been paused by the administrator. Please wait for it to resume.",
-        badge: { text: "PAUSED", variant: "destructive" as const },
+        subheader: "The contest has been paused. Please wait for it to resume.",
         gradient:
           "from-orange-50 to-red-100 dark:from-orange-950/20 dark:to-red-900/20",
         iconColor: "text-orange-600 dark:text-orange-400",
@@ -94,9 +89,7 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
         icon: <CheckCircle className="h-20 w-20" />,
         title: "Contest Completed",
         subtitle: "Thank you for participating!",
-        description:
-          "The Bebras Challenge has concluded. Check the leaderboard to see the final results.",
-        badge: { text: "FINISHED", variant: "default" as const },
+        subheader: "The contest has concluded. Check the leaderboard for final results.",
         gradient:
           "from-green-50 to-emerald-100 dark:from-green-950/20 dark:to-emerald-900/20",
         iconColor: "text-green-600 dark:text-green-400",
@@ -106,9 +99,7 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
       icon: <Play className="h-20 w-20" />,
       title: "Contest in Progress",
       subtitle: "The challenge is live!",
-      description:
-        "The Bebras Challenge is currently running. Navigate to your dashboard page to start solving challenges.",
-      badge: { text: "LIVE", variant: "default" as const },
+      subheader: "The contest is currently running. Navigate to your dashboard to start solving challenges.",
       gradient:
         "from-green-50 to-teal-100 dark:from-green-950/20 dark:to-teal-900/20",
       iconColor: "text-green-600 dark:text-green-400",
@@ -130,15 +121,16 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
           <div className="absolute inset-0 bg-white/50 dark:bg-black/20 backdrop-blur-sm" />
 
           <div className="relative p-8 md:p-12">
-            <div className="text-center space-y-6">
-              {/* Status Badge */}
-              <div className="flex justify-center">
-                <Badge
-                  variant={config.badge.variant}
-                  className="px-4 py-2 text-sm font-semibold"
-                >
-                  {config.badge.text}
-                </Badge>
+            <div className="text-center space-y-8">
+              {/* Main Title Section */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
+                  C-THINK COMPETITION
+                </h1>
+                <div className="text-base md:text-lg text-muted-foreground space-y-1">
+                  <p>School of Information Technology</p>
+                  <p>Universitas Ciputra Surabaya</p>
+                </div>
               </div>
 
               {/* Icon */}
@@ -146,25 +138,25 @@ export function Home({ status = ContestStatus.PENDING }: HomeProps) {
                 {config.icon}
               </div>
 
-              {/* Title */}
-              <div className="space-y-2">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground">
+              {/* Status Title and Subtitle */}
+              <div className="space-y-3">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
                   {config.title}
-                </h1>
-                <p className="text-xl md:text-2xl text-muted-foreground font-medium">
+                </h2>
+                <p className="text-lg md:text-xl text-muted-foreground font-medium">
                   {config.subtitle}
                 </p>
               </div>
 
-              {/* Description */}
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {config.description}
+              {/* Subheader */}
+              <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                {config.subheader}
               </p>
 
               {/* Dashboard Button */}
               {session && (
-                <div className="flex justify-center">
-                  <Button asChild>
+                <div className="flex justify-center pt-4">
+                  <Button asChild size="lg">
                     <a href={dashboardHref}>Go to Dashboard</a>
                   </Button>
                 </div>
