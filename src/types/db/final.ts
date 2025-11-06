@@ -7,7 +7,7 @@ export const FinalScoringFormSchema = z.object({
   scores: z.array(
     z.object({
       teamId: z.cuid2("Invalid team ID"),
-      score: z.number().min(0).max(100),
+      score: z.number().min(-10, "Score must be no lower than -10").max(10, "Score must be no higher than 10"),
     })
   ),
 });

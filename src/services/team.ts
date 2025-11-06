@@ -2,7 +2,6 @@
 
 import prisma from "@/lib/prisma";
 import {
-  TeamSchema,
   TeamWithMembersSchema,
   teamInclude,
 } from "@/types/db/team";
@@ -39,28 +38,6 @@ export async function getTop5TeamsByScoreAndLevel(level: "SMP" | "SMA") {
     },
   });
 }
-
-export async function createTeam(data: z.infer<typeof TeamSchema>) {
-  const result = TeamSchema.safeParse(data);
-
-  if (!result.success) {
-    return { error: "Invalid team data submitted." };
-  }
-
-  try {
-    const team = await prisma.team.create({
-      data: result.data,
-    });
-
-    revalidatePath("/admin/teams");
-    revalidatePath("/admin/accounts");
-
-    return { success: true, team };
-  } catch (err) {
-    return { error: "Failed to create team: " + (err as Error).message };
-  }
-}
-
 export async function createTeamWithMembers(
   data: z.infer<typeof TeamWithMembersSchema>
 ) {

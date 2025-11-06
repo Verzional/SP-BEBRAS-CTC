@@ -139,7 +139,7 @@ export async function submitFinalScores(data: {
       )
     );
 
-    revalidatePath("/admin/judge");
+    revalidatePath("/admin/judge/scores");
 
     return { success: true, finalScores };
   } catch (err) {
