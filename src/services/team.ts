@@ -76,9 +76,7 @@ export async function createTeamWithMembers(
   try {
     const { schoolId, name, level, members } = result.data;
 
-    // Create team with members in a transaction
     const team = await prisma.$transaction(async (tx) => {
-      // Create the team
       const newTeam = await tx.team.create({
         data: {
           schoolId,
@@ -87,7 +85,6 @@ export async function createTeamWithMembers(
         },
       });
 
-      // Create members for the team
       if (members.length > 0) {
         await tx.member.createMany({
           data: members.map((member) => ({
@@ -97,7 +94,6 @@ export async function createTeamWithMembers(
         });
       }
 
-      // Fetch the complete team with all relations
       return await tx.team.findUnique({
         where: { id: newTeam.id },
         include: teamInclude,
@@ -105,7 +101,6 @@ export async function createTeamWithMembers(
     });
 
     revalidatePath("/admin/teams");
-    revalidatePath("/admin/members");
 
     return { success: true, team };
   } catch (err) {
@@ -114,26 +109,6 @@ export async function createTeamWithMembers(
       error: "Failed to create team: " + (err as Error).message,
     };
   }
-}
-
-export async function updateTeam(
-  teamId: string,
-  data: z.infer<typeof TeamSchema>
-) {
-  const result = TeamSchema.safeParse(data);
-
-  if (!result.success) {
-    throw new Error("Invalid team data submitted.");
-  }
-
-  const team = await prisma.team.update({
-    where: { id: teamId },
-    data: result.data,
-  });
-
-  revalidatePath("/admin/teams");
-
-  return team;
 }
 
 export async function updateTeamWithMembers(
@@ -153,9 +128,7 @@ export async function updateTeamWithMembers(
   try {
     const { schoolId, name, level, members } = result.data;
 
-    // Update team with members in a transaction
     const team = await prisma.$transaction(async (tx) => {
-      // Update the team
       await tx.team.update({
         where: { id: teamId },
         data: {
@@ -165,12 +138,10 @@ export async function updateTeamWithMembers(
         },
       });
 
-      // Delete existing members
       await tx.member.deleteMany({
         where: { teamId },
       });
 
-      // Create new members
       if (members.length > 0) {
         await tx.member.createMany({
           data: members.map((member) => ({
@@ -180,7 +151,6 @@ export async function updateTeamWithMembers(
         });
       }
 
-      // Fetch the complete team with all relations
       return await tx.team.findUnique({
         where: { id: teamId },
         include: teamInclude,
@@ -188,7 +158,6 @@ export async function updateTeamWithMembers(
     });
 
     revalidatePath("/admin/teams");
-    revalidatePath("/admin/members");
 
     return { success: true, team };
   } catch (err) {

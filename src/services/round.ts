@@ -36,6 +36,7 @@ export async function createRound(data: z.infer<typeof RoundSchema>) {
     });
 
     revalidatePath("/admin/rounds");
+    revalidatePath("/judge/scoring");
 
     return { success: true, round };
   } catch (err) {
@@ -59,6 +60,7 @@ export async function updateRound(
   });
 
   revalidatePath("/admin/rounds");
+  revalidatePath("/judge/scoring");
 
   return round;
 }
@@ -69,6 +71,7 @@ export async function deleteRound(roundId: string) {
   });
 
   revalidatePath("/admin/rounds");
+  revalidatePath("/judge/scoring");
 
   return;
 }
