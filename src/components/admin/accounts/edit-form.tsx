@@ -1,14 +1,14 @@
 "use client";
 
-import { z } from "zod";
-import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { updateAccount } from "@/services/account";
+import { EditAccountSchema, EditAccountFormData } from "@/types/db/account";
 import { Team } from "@/generated/client/client";
 
 import { Button } from "@/components/ui/button";
@@ -49,25 +49,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const EditAccountSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(50, "Username must be less than 50 characters")
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      "Username can only contain letters, numbers, and underscores"
-    ),
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(100, "Name must be less than 100 characters"),
-  role: z.enum(["USER", "ADMIN"]),
-  teamId: z.string().optional(),
-});
-
-type EditAccountFormData = z.infer<typeof EditAccountSchema>;
-
 interface AccountEditFormProps {
   account: {
     id: string;
@@ -92,7 +73,7 @@ export function AccountEditForm({ account, teams = [] }: AccountEditFormProps) {
     defaultValues: {
       username: account.username,
       name: account.name,
-      role: account.role as "USER" | "ADMIN",
+      role: account.role as "USER" | "ADMIN" | "MASTER",
       teamId: account.teamId ?? undefined,
     },
   });
@@ -182,6 +163,7 @@ export function AccountEditForm({ account, teams = [] }: AccountEditFormProps) {
                     <SelectContent>
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="ADMIN">Admin</SelectItem>
+                      <SelectItem value="MASTER">Master</SelectItem>
                     </SelectContent>
                   </Select>
                   {fieldState.invalid && (

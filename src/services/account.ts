@@ -10,6 +10,9 @@ export async function getAllAccounts() {
     orderBy: {
       createdAt: "desc",
     },
+    where: {
+      role: { not: "MASTER" },
+    },
   });
 }
 

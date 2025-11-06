@@ -40,7 +40,7 @@ export async function createQuestion(
   }
 
   try {
-    const { title, level, difficulty, questionImages, answers } = result.data;
+    const { title, level, difficulty, questionImages, answers, roundType } = result.data;
 
     const question = await prisma.$transaction(async (tx) => {
       const newQuestion = await tx.question.create({
@@ -48,6 +48,7 @@ export async function createQuestion(
           title,
           level,
           difficulty,
+          roundType,
         },
       });
 
@@ -110,17 +111,16 @@ export async function updateQuestion(
   }
 
   const question = await prisma.$transaction(async (tx) => {
-    // Update the question
     await tx.question.update({
       where: { id: questionId },
       data: {
         title: result.data.title,
         level: result.data.level,
         difficulty: result.data.difficulty,
+        roundType: result.data.roundType,
       },
     });
 
-    // Handle answers
     const existingAnswers = await tx.answer.findMany({
       where: { questionId },
       include: { images: true },
@@ -129,16 +129,13 @@ export async function updateQuestion(
     const existingAnswerIds = new Set(existingAnswers.map(a => a.id));
     const formAnswerIds = new Set(result.data.answers.filter(a => a.id).map(a => a.id!));
 
-    // Answers to delete
     const toDeleteIds = [...existingAnswerIds].filter(id => !formAnswerIds.has(id));
 
-    // Delete answers and their images
     for (const id of toDeleteIds) {
       await tx.image.deleteMany({ where: { answerId: id } });
       await tx.answer.delete({ where: { id } });
     }
 
-    // Update existing answers
     for (const answerData of result.data.answers.filter(a => a.id)) {
       await tx.answer.update({
         where: { id: answerData.id! },
@@ -148,18 +145,15 @@ export async function updateQuestion(
         },
       });
 
-      // Handle images for this answer
       const existingImages = existingAnswers.find(a => a.id === answerData.id)?.images || [];
       const existingImageIds = new Set(existingImages.map(img => img.publicId));
       const formImageIds = new Set(answerData.images.map(img => img.publicId));
 
-      // Delete removed images
       const imagesToDelete = [...existingImageIds].filter(id => !formImageIds.has(id));
       for (const publicId of imagesToDelete) {
         await tx.image.deleteMany({ where: { publicId, answerId: answerData.id } });
       }
 
-      // Add new images
       const imagesToAdd = answerData.images.filter(img => !existingImageIds.has(img.publicId));
       if (imagesToAdd.length > 0) {
         await tx.image.createMany({
@@ -172,7 +166,6 @@ export async function updateQuestion(
       }
     }
 
-    // Create new answers
     for (const answerData of result.data.answers.filter(a => !a.id)) {
       const newAnswer = await tx.answer.create({
         data: {
