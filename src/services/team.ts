@@ -7,6 +7,7 @@ import {
 } from "@/types/db/team";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { hashSync } from "@node-rs/bcrypt";
 
 export async function getAllTeams() {
   return await prisma.team.findMany({
@@ -72,6 +73,38 @@ export async function createTeamWithMembers(
         });
       }
 
+      const school = await tx.school.findUnique({
+        where: { id: schoolId },
+        select: { name: true },
+      });
+
+      if (!school) {
+        throw new Error("School not found");
+      }
+
+      const username = name.replace(/\s+/g, '').toLowerCase();
+      const teamNameFirst3 = name.replace(/\s+/g, '').toLowerCase().substring(0, 3);
+      const schoolNameFirst3 = school.name.replace(/\s+/g, '').toLowerCase().substring(0, 3);
+      const password = teamNameFirst3 + schoolNameFirst3 + '2025';
+
+      const existingAccount = await tx.account.findUnique({
+        where: { username },
+      });
+
+      if (existingAccount) {
+        throw new Error("Username already exists. Please choose a different team name.");
+      }
+
+      await tx.account.create({
+        data: {
+          username,
+          password: hashSync(password, 10),
+          name,
+          teamId: newTeam.id,
+          role: 'USER',
+        },
+      });
+
       return await tx.team.findUnique({
         where: { id: newTeam.id },
         include: teamInclude,
@@ -79,6 +112,8 @@ export async function createTeamWithMembers(
     });
 
     revalidatePath("/admin/teams");
+    revalidatePath("/admin/accounts");
+    revalidatePath("/admin/accounts/create");
 
     return { success: true, team };
   } catch (err) {
@@ -137,6 +172,7 @@ export async function updateTeamWithMembers(
 
     revalidatePath("/admin/teams");
     revalidatePath("/admin/accounts");
+    revalidatePath("/admin/accounts/create");
 
     return { success: true, team };
   } catch (err) {
