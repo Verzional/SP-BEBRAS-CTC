@@ -1,6 +1,6 @@
 import { getAllRounds } from "@/services/round";
 import { getTop5TeamsByScoreAndLevel } from "@/services/team";
-import { FinalScoringForm } from "@/components/admin/judge/final-scoring-form";
+import { FinalScoringForm } from "@/components/judge/final-scoring-form";
 
 export default async function JudgeScoringPage() {
   const [rounds, top5SMA, top5SMP] = await Promise.all([

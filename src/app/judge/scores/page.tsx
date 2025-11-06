@@ -1,4 +1,4 @@
-import { TeamScores } from "@/components/admin/judge/team-scores";
+import { TeamScores } from "@/components/judge/team-scores";
 
 export default function JudgeScoresPage() {
   return <TeamScores />;

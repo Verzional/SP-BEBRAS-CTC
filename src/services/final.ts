@@ -12,7 +12,6 @@ export async function getAllScores() {
 }
 
 export async function getTopTeamScoresByLevel(level: "SMP" | "SMA") {
-  // First get the top 5 teams by score for this level
   const topTeams = await prisma.team.findMany({
     where: { level },
     orderBy: { score: "desc" },
@@ -20,9 +19,8 @@ export async function getTopTeamScoresByLevel(level: "SMP" | "SMA") {
     select: { id: true },
   });
 
-  const teamIds = topTeams.map(team => team.id);
+  const teamIds = topTeams.map((team) => team.id);
 
-  // Then get detailed scores for these teams
   const teams = await prisma.team.findMany({
     where: { id: { in: teamIds } },
     select: {
@@ -53,7 +51,7 @@ export async function getTopTeamScoresByLevel(level: "SMP" | "SMA") {
       },
     },
     orderBy: {
-      score: "desc", // Order by preliminary score
+      score: "desc",
     },
   });
 
@@ -107,6 +105,27 @@ export async function submitFinalScores(data: {
   }
 
   try {
+    const existingScores = await prisma.finalScore.findMany({
+      where: {
+        roundId: result.data.roundId,
+        teamId: { in: result.data.scores.map((s) => s.teamId) },
+        judgeId: session.user.id,
+      },
+      select: {
+        teamId: true,
+        team: {
+          select: { name: true },
+        },
+      },
+    });
+
+    if (existingScores.length > 0) {
+      const teamNames = existingScores.map((es) => es.team.name).join(", ");
+      return {
+        error: `You have already submitted scores for the following teams in this round: ${teamNames}. You cannot submit scores for the same teams in the same round again.`,
+      };
+    }
+
     const finalScores = await prisma.$transaction(
       result.data.scores.map((scoreData) =>
         prisma.finalScore.create({

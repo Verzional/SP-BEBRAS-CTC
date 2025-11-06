@@ -90,11 +90,9 @@ export function FinalScoringForm({ rounds, top5Teams }: FinalScoringFormProps) {
         toast.error(result.error);
       } else {
         toast.success("Final scores submitted successfully!");
-        setSelectedLevel("SMP");
-        setValue("level", "SMP");
-        setValue("roundId", "");
-        setSelectedRound(null);
-        replace([]);
+        const levelTeams = top5Teams[selectedLevel] || [];
+        const resetScores = levelTeams.map((team) => ({ teamId: team.id, score: 0 }));
+        replace(resetScores);
       }
     });
   };
