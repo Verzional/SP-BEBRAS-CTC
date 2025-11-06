@@ -58,7 +58,7 @@ export function PostList({ posts = [] }: PostListProps) {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
   return (

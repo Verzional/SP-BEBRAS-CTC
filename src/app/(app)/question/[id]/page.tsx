@@ -35,7 +35,6 @@ export default async function QuestionPage({ params }: IDParams) {
     }
 
     if (answeredCheck.hasAnswered && !answeredCheck.isRecent) {
-      // This is a revisit, show "already answered"
       return (
         <div className="max-w-2xl mx-auto p-6">
           <div className="text-center">

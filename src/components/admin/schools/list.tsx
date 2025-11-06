@@ -58,7 +58,7 @@ export function SchoolList({ schools = [] }: SchoolListProps) {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
   return (

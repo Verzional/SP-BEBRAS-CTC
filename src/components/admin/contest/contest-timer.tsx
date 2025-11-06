@@ -31,7 +31,6 @@ export function ContestTimer() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch initial contest status
     const fetchContestStatus = async () => {
       try {
         const response = await fetch("/api/contest/status");
@@ -46,7 +45,6 @@ export function ContestTimer() {
 
     fetchContestStatus();
 
-    // Subscribe to real-time updates
     const channel = pusherClient.subscribe("contest-channel");
     channel.bind("status-update", (updatedContest: ContestState) => {
       setContestState(updatedContest);

@@ -58,7 +58,7 @@ export function RoundList({ rounds = [] }: RoundListProps) {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1); 
   };
 
   const handleDeleteClick = (round: { id: string; name: string }) => {
@@ -73,7 +73,6 @@ export function RoundList({ rounds = [] }: RoundListProps) {
       try {
         await deleteRound(roundToDelete.id);
         toast.success("Round deleted successfully!");
-        // Optionally refresh the list or update state
       } catch (error) {
         toast.error("Failed to delete round: " + (error as Error).message);
       }

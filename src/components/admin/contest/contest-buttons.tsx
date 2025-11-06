@@ -127,7 +127,6 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
   const getActionButtons = () => {
     const buttons = [];
 
-    // Start/Restart button
     if (status === ContestStatus.PENDING || status === ContestStatus.FINISHED) {
       buttons.push(
         <Button
@@ -147,7 +146,6 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       );
     }
 
-    // Pause button
     if (status === ContestStatus.RUNNING || status === ContestStatus.FROZEN) {
       buttons.push(
         <Button
@@ -168,7 +166,6 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       );
     }
 
-    // Resume button
     if (status === ContestStatus.PAUSED) {
       buttons.push(
         <Button
@@ -188,7 +185,6 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       );
     }
 
-    // Freeze/Unfreeze buttons
     if (status === ContestStatus.RUNNING) {
       buttons.push(
         <Button
@@ -228,7 +224,6 @@ export function ContestButtons({ initialContestState }: ContestButtonsProps) {
       );
     }
 
-    // End button (not shown when pending)
     if (status !== ContestStatus.PENDING) {
       buttons.push(
         <Button

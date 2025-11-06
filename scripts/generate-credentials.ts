@@ -24,7 +24,7 @@ async function generateCredentials() {
       console.log(`Team Name: ${team.name}`);
       console.log(`username: ${username}`);
       console.log(`password: ${password}`);
-      console.log(""); // Empty line for separation
+      console.log(""); 
     });
   } catch (error) {
     console.error("Error generating credentials:", error);
