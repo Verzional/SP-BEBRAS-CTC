@@ -232,8 +232,10 @@ async function getRandomUnsolvedQuestion(
     id: { notIn: string[] };
     level?: "SMP" | "SMA";
     difficulty?: "EASY" | "MEDIUM" | "HARD";
+    roundType: "PRELIMINARY";
   } = {
     id: { notIn: solvedQuestionIds },
+    roundType: "PRELIMINARY",
   };
 
   if (level) {

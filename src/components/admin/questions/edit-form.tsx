@@ -85,6 +85,7 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
       title: question.title,
       level: question.level,
       difficulty: question.difficulty,
+      roundType: question.roundType,
       questionImages: [],
       answers: (question.answers || []).map((answer) => ({
         id: answer.id,
@@ -401,7 +402,9 @@ export function QuestionEditForm({ question }: QuestionEditFormProps) {
                           <SelectValue placeholder="Select round type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="PRELIMINARY">Preliminary</SelectItem>
+                          <SelectItem value="PRELIMINARY">
+                            Preliminary
+                          </SelectItem>
                           <SelectItem value="FINAL">Final</SelectItem>
                         </SelectContent>
                       </Select>

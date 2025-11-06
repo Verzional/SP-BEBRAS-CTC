@@ -59,6 +59,7 @@ export function QuestionCreateForm() {
       title: "",
       level: "SMP",
       difficulty: "EASY",
+      roundType: "PRELIMINARY",
       questionImages: [],
       answers: [
         { content: "", correct: false, images: [] },
@@ -318,7 +319,9 @@ export function QuestionCreateForm() {
                           <SelectValue placeholder="Select round type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="PRELIMINARY">Preliminary</SelectItem>
+                          <SelectItem value="PRELIMINARY">
+                            Preliminary
+                          </SelectItem>
                           <SelectItem value="FINAL">Final</SelectItem>
                         </SelectContent>
                       </Select>
