@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getTeamById, getTeamRank } from "@/services/team";
+import { getActiveContest } from "@/services/contest";
 import { Dashboard } from "@/components/app/dashboard";
 import { ContestGuard } from "@/components/layout/contest-guard";
 
@@ -28,10 +29,12 @@ export default async function DashboardPage() {
 
   const rank = await getTeamRank(session.user.teamId);
 
+  const contest = await getActiveContest();
+
   return (
     <>
       <ContestGuard />
-      <Dashboard team={team} rank={rank ?? undefined} />
+      <Dashboard team={team} rank={rank ?? undefined} contestStatus={contest.status} />
     </>
   );
 }

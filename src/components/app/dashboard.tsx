@@ -32,6 +32,7 @@ interface Team {
 interface DashboardProps {
   team: Team;
   rank?: number;
+  contestStatus: string;
 }
 
 const getMedalCategory = (rank: number) => {
@@ -54,14 +55,15 @@ const getMedalBgClass = (category: string) => {
   }
 };
 
-export function Dashboard({ team, rank }: DashboardProps) {
+export function Dashboard({ team, rank, contestStatus }: DashboardProps) {
   const router = useRouter();
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [qrSize] = useState(() =>
     typeof window !== "undefined" ? Math.min(250, window.innerWidth * 0.6) : 250
   );
 
-  const medalCategory = rank ? getMedalCategory(rank) : null;
+  const medalCategory =
+    rank && contestStatus !== "FROZEN" ? getMedalCategory(rank) : null;
 
   useEffect(() => {
     const channel = pusherClient.subscribe(`team-${team.id}`);

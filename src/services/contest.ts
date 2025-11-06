@@ -3,7 +3,6 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { pusherServer } from "@/lib/pusher";
-import { Prisma } from "@/generated/client/client";
 import { ContestStatus } from "@/generated/client/enums";
 import { revalidatePath } from "next/cache";
 import { getQuestionForTeam } from "./question";
@@ -52,9 +51,13 @@ export async function startContest(formData: FormData) {
     updatedContest
   );
 
-  const teams = await prisma.team.findMany({ select: { id: true, level: true } });
+  const teams = await prisma.team.findMany({
+    select: { id: true, level: true },
+  });
 
-  await Promise.all(teams.map((team) => getQuestionForTeam(team.id, team.level, "EASY")));
+  await Promise.all(
+    teams.map((team) => getQuestionForTeam(team.id, team.level, "EASY"))
+  );
 
   revalidatePath("/admin");
 }
@@ -145,30 +148,10 @@ export async function freezeContest() {
     throw new Error("Contest is not running.");
   }
 
-  const frozenLeaderboard = await prisma.account.findMany({
-    where: {
-      role: "USER",
-      teamId: { not: null },
-    },
-    orderBy: [{ team: { score: "desc" } }, { createdAt: "asc" }],
-    select: {
-      id: true,
-      teamId: true,
-      team: {
-        select: {
-          id: true,
-          name: true,
-          score: true,
-        },
-      },
-    },
-  });
-
   const updatedContest = await prisma.contest.update({
     where: { id: contest.id },
     data: {
       status: ContestStatus.FROZEN,
-      frozenLeaderboard: frozenLeaderboard,
     },
   });
 
@@ -198,7 +181,6 @@ export async function unfreezeContest() {
     where: { id: contest.id },
     data: {
       status: ContestStatus.RUNNING,
-      frozenLeaderboard: Prisma.JsonNull,
     },
   });
 
@@ -259,7 +241,6 @@ export async function setPendingContest() {
       pausedTime: null,
       totalPausedDuration: 0,
       statusBeforePause: null,
-      frozenLeaderboard: Prisma.JsonNull,
     },
   });
 
