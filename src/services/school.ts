@@ -32,6 +32,8 @@ export async function createSchool(data: z.infer<typeof SchoolSchema>) {
     });
 
     revalidatePath("/admin/schools");
+    revalidatePath("/admin/teams");
+    revalidatePath("/admin/teams/create");
 
     return { success: true, school };
   } catch (err) {
@@ -55,6 +57,8 @@ export async function updateSchool(
   });
 
   revalidatePath("/admin/schools");
+  revalidatePath("/admin/teams");
+  revalidatePath("/admin/teams/create");
 
   return school;
 }
@@ -65,6 +69,8 @@ export async function deleteSchool(schoolId: string) {
   });
 
   revalidatePath("/admin/schools");
+  revalidatePath("/admin/teams");
+  revalidatePath("/admin/teams/create");
 
   return deleted;
 }
