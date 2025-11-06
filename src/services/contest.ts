@@ -52,9 +52,9 @@ export async function startContest(formData: FormData) {
     updatedContest
   );
 
-  const teams = await prisma.team.findMany({ select: { id: true } });
+  const teams = await prisma.team.findMany({ select: { id: true, level: true } });
 
-  await Promise.all(teams.map((team) => getQuestionForTeam(team.id)));
+  await Promise.all(teams.map((team) => getQuestionForTeam(team.id, team.level, "EASY")));
 
   revalidatePath("/admin");
 }
