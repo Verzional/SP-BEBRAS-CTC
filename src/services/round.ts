@@ -1,5 +1,7 @@
+"use server";
+
 import prisma from "@/lib/prisma";
-import { FinalScoreSchema, RoundSchema } from "@/types/db/round";
+import { RoundSchema } from "@/types/db/round";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -7,6 +9,10 @@ export async function getAllRounds() {
   return await prisma.round.findMany({
     orderBy: {
       createdAt: "desc",
+    },
+    select: {
+      id: true,
+      name: true,
     },
   });
 }
@@ -65,18 +71,4 @@ export async function deleteRound(roundId: string) {
   revalidatePath("/admin/rounds");
 
   return;
-}
-
-export async function submitFinalScore(data: z.infer<typeof FinalScoreSchema>) {
-  const result = FinalScoreSchema.safeParse(data);
-
-  if (!result.success) {
-    throw new Error("Invalid final score data submitted.");
-  }
-
-  const finalScore = await prisma.finalScore.create({
-    data: result.data,
-  });
-
-  return finalScore;
 }

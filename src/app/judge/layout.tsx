@@ -1,6 +1,6 @@
 import { Sidebar } from "@/components/navigation/sidebar";
 
-export default function MasterLayout({
+export default function JudgeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -8,7 +8,7 @@ export default function MasterLayout({
   return (
     <Sidebar>
       <div className="flex flex-col items-center justify-center h-full p-4">
-        <div className="w-full max-w-4xl space-y-4">{children}</div>
+        <div className="w-full max-w-6xl space-y-4">{children}</div>
       </div>
     </Sidebar>
   );

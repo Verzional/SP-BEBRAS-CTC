@@ -6,7 +6,10 @@ import {
   House,
   ScanLine,
   Timer,
+  Trophy,
+  Gavel,
   SignpostBig,
+  Calendar,
   School,
   UsersRound,
   CircleUserRound,
@@ -43,6 +46,36 @@ const data = {
       isCollapsible: false,
     },
     {
+      title: "Master",
+      url: "#",
+      icon: Trophy,
+      items: [
+        {
+          title: "Cleanup Manager",
+          url: "/master",
+        },
+        {
+          title: "Leaderboard",
+          url: "/master/leaderboard",
+        },
+      ],
+    },
+    {
+      title: "Judge",
+      url: "#",
+      icon: Gavel,
+      items: [
+        {
+          title: "Final Scoring",
+          url: "/judge/scoring",
+        },
+        {
+          title: "Team Scores",
+          url: "/judge/scores",
+        },
+      ],
+    },
+    {
       title: "Posts",
       url: "#",
       icon: SignpostBig,
@@ -54,6 +87,21 @@ const data = {
         {
           title: "Create Post",
           url: "/admin/posts/create",
+        },
+      ],
+    },
+    {
+      title: "Rounds",
+      url: "#",
+      icon: Calendar,
+      items: [
+        {
+          title: "Round List",
+          url: "/admin/rounds",
+        },
+        {
+          title: "Create Round",
+          url: "/admin/rounds/create",
         },
       ],
     },

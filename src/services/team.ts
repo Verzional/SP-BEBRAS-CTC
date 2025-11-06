@@ -28,26 +28,14 @@ export async function getTeamById(teamId: string) {
   });
 }
 
-export async function getTop5TeamsByScoreHS() {
+export async function getTop5TeamsByScoreAndLevel(level: "SMP" | "SMA") {
   return await prisma.team.findMany({
-    orderBy: {
-      score: "desc",
-    },
+    where: { level },
+    orderBy: { score: "desc" },
     take: 5,
-    where: {
-      level: "SMA",
-    },
-  });
-}
-
-export async function getTop5TeamsByScoreMS() {
-  return await prisma.team.findMany({
-    orderBy: {
-      score: "desc",
-    },
-    take: 5,
-    where: {
-      level: "SMP",
+    select: {
+      id: true,
+      name: true,
     },
   });
 }

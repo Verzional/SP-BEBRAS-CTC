@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bebras - CTC",
+  title: "C-Think Universitas Ciputra Surabaya",
   description: "Bebras Computational Thinking Challenge @ UC",
 };
 

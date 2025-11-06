@@ -40,6 +40,10 @@ export const authConfig = {
         return userRole === "MASTER";
       }
 
+      if (pathname.startsWith("/judge")) {
+        return userRole === "MASTER";
+      }
+
       if (pathname.startsWith("/admin")) {
         return isAdminOrMaster(userRole);
       }
