@@ -23,6 +23,9 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+            echo "💡 Using Node 22..."
+            nvm use 22
+
             echo "📁 Navigating to project directory..."
             cd ${{ vars.PROJECT_PATH }}
 
