@@ -8,7 +8,7 @@ import { z } from "zod";
 export async function getAllRounds() {
   return await prisma.round.findMany({
     orderBy: {
-      createdAt: "desc",
+      createdAt: "asc",
     },
     select: {
       id: true,
