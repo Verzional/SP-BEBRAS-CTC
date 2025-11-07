@@ -27,7 +27,7 @@ export default async function DashboardPage() {
     return <div>Team not found</div>;
   }
 
-  const rank = await getTeamRank(session.user.teamId);
+  const rank = await getTeamRank(session.user.teamId, team.level);
 
   const contest = await getActiveContest();
 

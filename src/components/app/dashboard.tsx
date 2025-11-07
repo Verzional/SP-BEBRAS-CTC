@@ -19,6 +19,7 @@ interface Team {
   id: string;
   name: string;
   score: number;
+  level: "SMP" | "SMA";
   school: {
     id: string;
     name: string;

@@ -46,10 +46,11 @@ const getMedalIcon = (category: string) => {
 
 export function Leaderboard() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState<"all" | "SMA" | "SMP">("all");
   const { mutate } = useSWRConfig();
   const limit = 5;
   const { data, error, isLoading } = useSWR<LeaderboardResponse>(
-    `/api/leaderboard?page=${currentPage}&limit=${limit}`,
+    `/api/leaderboard?page=${currentPage}&limit=${limit}${selectedLevel !== "all" ? `&level=${selectedLevel}` : ""}`,
     fetcher,
     {
       refreshInterval: 5000,
@@ -63,11 +64,11 @@ export function Leaderboard() {
     pusherClient.subscribe("contest-channel");
 
     const handleLeaderboardUpdate = () => {
-      mutate(`/api/leaderboard?page=${currentPage}&limit=${limit}`);
+      mutate(`/api/leaderboard?page=${currentPage}&limit=${limit}${selectedLevel !== "all" ? `&level=${selectedLevel}` : ""}`);
     };
 
     const handleContestStatusUpdate = () => {
-      mutate(`/api/leaderboard?page=${currentPage}&limit=${limit}`);
+      mutate(`/api/leaderboard?page=${currentPage}&limit=${limit}${selectedLevel !== "all" ? `&level=${selectedLevel}` : ""}`);
     };
 
     pusherClient.bind("leaderboard-update", handleLeaderboardUpdate);
@@ -79,7 +80,7 @@ export function Leaderboard() {
       pusherClient.unsubscribe("leaderboard-channel");
       pusherClient.unsubscribe("contest-channel");
     };
-  }, [mutate, currentPage]);
+  }, [mutate, currentPage, selectedLevel]);
 
   if (isLoading) {
     return (
@@ -109,7 +110,7 @@ export function Leaderboard() {
   const totalPages = data?.meta?.totalPages || 1;
   const startRank = (currentPage - 1) * limit + 1;
 
-  const currentCategory = getMedalCategory(startRank);
+  const currentCategory = selectedLevel === "all" ? getMedalCategory(startRank) : getMedalCategory(startRank);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -123,6 +124,11 @@ export function Leaderboard() {
     }
   };
 
+  const handleLevelChange = (level: "all" | "SMA" | "SMP") => {
+    setSelectedLevel(level);
+    setCurrentPage(1); // Reset to first page when changing level
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -134,10 +140,32 @@ export function Leaderboard() {
         )}
       </div>
 
+      {/* Level Selection */}
+      <div className="flex gap-2">
+        <Button
+          variant={selectedLevel === "all" ? "default" : "outline"}
+          onClick={() => handleLevelChange("all")}
+        >
+          All Levels
+        </Button>
+        <Button
+          variant={selectedLevel === "SMA" ? "default" : "outline"}
+          onClick={() => handleLevelChange("SMA")}
+        >
+          SMA
+        </Button>
+        <Button
+          variant={selectedLevel === "SMP" ? "default" : "outline"}
+          onClick={() => handleLevelChange("SMP")}
+        >
+          SMP
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Rankings
+            Rankings {selectedLevel !== "all" ? `- ${selectedLevel}` : ""}
             <Badge
               variant="default"
               className={getMedalBgClass(currentCategory)}

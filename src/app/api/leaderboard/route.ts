@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
 
   const page = parseInt(searchParams.get("page") || "1", 10);
   const limit = parseInt(searchParams.get("limit") || "5", 10);
+  const level = searchParams.get("level") as "SMA" | "SMP" | null;
 
   if (isNaN(page) || page < 1 || isNaN(limit) || limit < 1) {
     return NextResponse.json(
@@ -25,10 +26,12 @@ export async function GET(req: NextRequest) {
         id: string;
         name: string | null;
         score: number;
+        level?: "SMA" | "SMP";
       }>;
 
-      const paginatedData = frozenData.slice(skip, skip + limit);
-      const totalUsers = frozenData.length;
+      const filteredData = level ? frozenData.filter(team => team.level === level) : frozenData;
+      const paginatedData = filteredData.slice(skip, skip + limit);
+      const totalUsers = filteredData.length;
 
       return NextResponse.json({
         data: paginatedData,
@@ -44,6 +47,7 @@ export async function GET(req: NextRequest) {
 
     const [teams, totalTeams] = await prisma.$transaction([
       prisma.team.findMany({
+        where: level ? { level } : {},
         orderBy: [{ score: "desc" }, { createdAt: "asc" }],
         skip: skip,
         take: limit,
@@ -58,7 +62,9 @@ export async function GET(req: NextRequest) {
           },
         },
       }),
-      prisma.team.count(),
+      prisma.team.count({
+        where: level ? { level } : {},
+      }),
     ]);
 
     const leaderboardData = teams.map((team) => ({

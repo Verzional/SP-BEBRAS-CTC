@@ -193,10 +193,10 @@ export async function deleteTeam(teamId: string) {
   return deleted;
 }
 
-export async function getTeamRank(teamId: string): Promise<number | null> {
+export async function getTeamRank(teamId: string, level?: "SMP" | "SMA"): Promise<number | null> {
   const team = await prisma.team.findUnique({
     where: { id: teamId },
-    select: { score: true, createdAt: true },
+    select: { score: true, createdAt: true, level: true },
   });
 
   if (!team) {
@@ -205,6 +205,7 @@ export async function getTeamRank(teamId: string): Promise<number | null> {
 
   const rank = await prisma.team.count({
     where: {
+      level: level || team.level,
       OR: [
         { score: { gt: team.score } },
         {
