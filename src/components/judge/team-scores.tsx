@@ -34,6 +34,7 @@ interface ScoreEntry {
 interface TeamScore {
   teamId: string;
   teamName: string;
+  schoolName: string;
   level: "SMP" | "SMA";
   scores: ScoreEntry[];
   totalScore: number;
@@ -97,7 +98,10 @@ export function TeamScores({ smpScores, smaScores }: TeamScoresProps) {
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
-                  <h2 className="text-lg font-semibold">{team.teamName}</h2>
+                  <div>
+                    <h2 className="text-lg font-semibold">{team.teamName}</h2>
+                    <p className="text-sm text-muted-foreground">{team.schoolName}</p>
+                  </div>
                 </div>
                 <Badge variant="secondary">{team.level}</Badge>
               </div>
@@ -109,7 +113,7 @@ export function TeamScores({ smpScores, smaScores }: TeamScoresProps) {
 
             <CollapsibleContent>
               <Table className="mt-4">
-                <TableCaption>Score breakdown for {team.teamName}</TableCaption>
+                <TableCaption>Score breakdown for {team.teamName} - {team.schoolName}</TableCaption>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Round</TableHead>

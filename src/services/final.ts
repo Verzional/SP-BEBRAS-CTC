@@ -28,6 +28,12 @@ export async function getTopTeamScoresByLevel(level: "SMP" | "SMA") {
       name: true,
       score: true,
       level: true,
+      school: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       finalScores: {
         select: {
           id: true,
@@ -56,24 +62,31 @@ export async function getTopTeamScoresByLevel(level: "SMP" | "SMA") {
   });
 
   const result = teams.map((team) => {
-    const scores = [
-      {
-        round: "Preliminary",
-        score: team.score,
-        judge: "App",
-      },
-      ...team.finalScores.map((finalScore) => ({
-        round: finalScore.round.name,
-        score: finalScore.score,
-        judge: finalScore.judge.name,
-      })),
-    ];
+    // const scores = [
+    //   {
+    //     round: "Preliminary",
+    //     score: team.score,
+    //     judge: "App",
+    //   },
+    //   ...team.finalScores.map((finalScore) => ({
+    //     round: finalScore.round.name,
+    //     score: finalScore.score,
+    //     judge: finalScore.judge.name,
+    //   })),
+    // ];
+
+    const scores = team.finalScores.map((finalScore) => ({
+      round: finalScore.round.name,
+      score: finalScore.score,
+      judge: finalScore.judge.name,
+    }));
 
     const totalScore = scores.reduce((sum, score) => sum + score.score, 0);
 
     return {
       teamId: team.id,
       teamName: team.name,
+      schoolName: team.school.name,
       level: team.level,
       scores,
       totalScore,
