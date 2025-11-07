@@ -96,14 +96,14 @@ export function Dashboard({ team, rank, contestStatus }: DashboardProps) {
             <CardTitle className="flex items-center gap-2">
               Team Information
               <Badge variant="secondary">Score: {team.score}</Badge>
-              {medalCategory && (
+              {/* {medalCategory && (
                 <Badge
                   variant="default"
                   className={getMedalBgClass(medalCategory)}
                 >
                   {medalCategory}
                 </Badge>
-              )}
+              )} */}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
