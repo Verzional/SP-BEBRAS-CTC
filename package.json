@@ -1,6 +1,6 @@
 {
-  "name": "bebras",
-  "version": "0.1.0",
+  "name": "uc-ctc",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -39,7 +39,7 @@
     "cmdk": "^1.1.1",
     "dotenv": "^17.2.3",
     "lucide-react": "^0.548.0",
-    "next": "16.0.0",
+    "next": "16.0.10",
     "next-auth": "5.0.0-beta.29",
     "next-cloudinary": "^6.16.3",
     "next-themes": "^0.4.6",
