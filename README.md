@@ -4,14 +4,14 @@ C-Think is a logic competition for Middle School & High School students hosted b
 
 ## Features
 
-### 🏆 Competition Management
+### Competition Management
 - **Contest Control**: Real-time management of contest status and timing.
 - **Live Leaderboard**: Real-time ranking of participating teams.
 - **Round Management**: Support for different competition rounds (Preliminary, etc.).
 - **Post/Station System**: Management of physical or virtual stations for the competition.
 - **School & Team Management**: Organization of participants by school and team.
 
-### 📝 Content & Assessment
+### Content & Assessment
 - **Question Bank**: Rich text and image-based logic questions with difficulty levels.
 - **Scoring System**: Automatic and manual scoring capabilities.
 - **QR Code Scanning**: Quick verification and interaction at competition posts.
@@ -23,7 +23,7 @@ C-Think is a logic competition for Middle School & High School students hosted b
 - **Judge**: Dedicated interface for evaluating team performance and inputting scores.
 - **Team (User)**: Participant dashboard for viewing questions, submitting answers, and tracking progress.
 
-### 🛠️ Tech Stack
+## Tech Stack
 - **Framework**: Next.js 16 (App Router)
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Auth.js v5
